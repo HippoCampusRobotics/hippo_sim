@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="base_mass" value="1.47" />
+    <xacro:property name="ixx" value="0.0024" />
+    <xacro:property name="iyy" value="0.01717" />
+    <xacro:property name="izz" value="0.010717" />
+</robot>

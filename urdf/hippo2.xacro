@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="hippocampus">
+    <xacro:include filename="$(find hippo_sim)/urdf/hippo2_params.xacro" />
+    <xacro:include filename="$(find hippo_sim)/urdf/thruster_macro.xacro" />
+    <link name="base_link">
+        <origin> xyz="0 0 0" rpy="0 0 0"</origin>
+        <inertial>
+            <mass value="${base_mass}" />
+            <inertia ixx="${ixx}" ixy="0.0" ixz="0.0" iyy="${iyy}" iyz="0.0" izz="${izz}" />
+        </inertial>
+        <visual>
+            <mesh filename="package://hippo_sim/meshes/hippo2.stl" />
+        </visual>
+    </link>
+
+    <xacro:thruster parent="base_link" suffix="starboard_top" xyz="0 0.1 0.1" axis="1 0 0" cw="true" />
+
+</robot>

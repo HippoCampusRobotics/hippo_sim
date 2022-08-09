@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="thruster" params="suffix parent xyz axis cw">
+        <joint name="${suffix}_thruster_joint" type="continuous">
+            <axis xyz="${axis}" />
+            <origin xyz="${xyz}" />
+            <parent link="${parent}" />
+            <child link="${suffix}_thruster_link" />
+        </joint>
+        <link name="${suffix}_thruster_link">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <visual>
+                <geometry>
+                    <mesh filename="package://hippo_sim/meshes/propeller.stl" />
+                </geometry>
+            </visual>
+        </link>
+    </xacro:macro>
+</robot>
