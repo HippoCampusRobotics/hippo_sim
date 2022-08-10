@@ -12,10 +12,11 @@
             <inertia ixx="${ixx}" ixy="0.0" ixz="0.0" iyy="${iyy}" iyz="0.0" izz="${izz}" />
         </inertial>
         <visual>
-            <mesh filename="package://hippo_sim/meshes/hippo2.stl" />
+            <geometry>
+                <mesh filename="file://$(find hippo_sim)/meshes/hippo2.dae" />
+            </geometry>
         </visual>
     </link>
 
     <xacro:thruster parent="base_link" suffix="starboard_top" xyz="0 0.1 0.1" axis="1 0 0" cw="true" />
-
 </robot>
