@@ -23,16 +23,11 @@ def generate_launch_description():
     doc = xacro.parse(open(default_model_path))
     xacro.process_doc(doc)
     params = {'robot_description': doc.toxml()}
-    node_robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        output='screen',
-        parameters=[params]
-    )
     spawn_entity = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
-        arguments=['-topic', 'robot_description', '-entity', 'cartpole'],
+        package='ros_ign_gazebo',
+        executable='create',
+        parameters=[params],
+        arguments=['-param', 'robot_description'],
         output='screen')
 
     gazebo = ExecuteProcess(
@@ -42,6 +37,5 @@ def generate_launch_description():
 
     return LaunchDescription([
         gazebo,
-        node_robot_state_publisher,
         spawn_entity
     ])
