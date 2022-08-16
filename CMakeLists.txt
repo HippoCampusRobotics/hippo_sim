@@ -4,7 +4,7 @@ project(hippo_sim)
 find_package(ament_cmake REQUIRED)
 
 install(
-  DIRECTORY launch meshes urdf world
+  DIRECTORY launch meshes urdf world textures
   DESTINATION share/${PROJECT_NAME}
 )
 

@@ -1,18 +1,22 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <sdf version="1.7">
     <world name="world_demo">
+        <!-- <scene name="scene">
+            <sky>
+                <clouds>
+                    <speed>12</speed>
+                </clouds>
+            </sky>
+        </scene> -->
+
         <physics name="1ms" type="ignored">
             <max_step_size>0.001</max_step_size>
             <real_time_factor>1.0</real_time_factor>
         </physics>
-        <plugin filename="libignition-gazebo-physics-system.so" name="ignition::gazebo::systems::Physics">
-        </plugin>
-        <plugin filename="libignition-gazebo-user-commands-system.so" name="ignition::gazebo::systems::UserCommands">
-        </plugin>
-        <plugin filename="libignition-gazebo-scene-broadcaster-system.so" name="ignition::gazebo::systems::SceneBroadcaster">
-        </plugin>
-        <gui fullscreen="0">
-            <!-- 3D scene -->
+        <plugin filename="libignition-gazebo-physics-system.so" name="ignition::gazebo::systems::Physics"></plugin>
+        <plugin filename="libignition-gazebo-user-commands-system.so" name="ignition::gazebo::systems::UserCommands"></plugin>
+        <plugin filename="libignition-gazebo-scene-broadcaster-system.so" name="ignition::gazebo::systems::SceneBroadcaster"></plugin>
+        <!-- <gui fullscreen="0">
             <plugin filename="GzScene3D" name="3D View">
                 <ignition-gui>
                     <title>3D View</title>
@@ -20,10 +24,7 @@
                     <property type="string" key="state">docked</property>
                 </ignition-gui>
 
-                <engine>ogre</engine>
-                <scene>scene</scene>
-                <ambient_light>0.4 0.4 0.4</ambient_light>
-                <background_color>0.8 0.8 0.8</background_color>
+                <engine>ogre2</engine>
             </plugin>
             <plugin filename="WorldControl" name="World control">
                 <ignition-gui>
@@ -36,8 +37,8 @@
 
                     <property type="string" key="state">floating</property>
                     <anchors target="3D View">
-                        <line own="left" target="left"/>
-                        <line own="bottom" target="bottom"/>
+                        <line own="left" target="left" />
+                        <line own="bottom" target="bottom" />
                     </anchors>
                 </ignition-gui>
 
@@ -58,8 +59,8 @@
 
                     <property type="string" key="state">floating</property>
                     <anchors target="3D View">
-                        <line own="right" target="right"/>
-                        <line own="bottom" target="bottom"/>
+                        <line own="right" target="right" />
+                        <line own="bottom" target="bottom" />
                     </anchors>
                 </ignition-gui>
 
@@ -69,10 +70,9 @@
                 <iterations>true</iterations>
                 <topic>/world/world_demo/stats</topic>
             </plugin>
-            <plugin filename="EntityTree" name="Entity tree">
-            </plugin>
-        </gui>
-        <light type="directional" name="sun">
+            <plugin filename="EntityTree" name="Entity tree"></plugin>
+        </gui> -->
+        <!-- <light type="directional" name="sun">
             <cast_shadows>true</cast_shadows>
             <pose>0 0 10 0 0 0</pose>
             <diffuse>0.8 0.8 0.8 1</diffuse>
@@ -84,31 +84,35 @@
                 <quadratic>0.001</quadratic>
             </attenuation>
             <direction>-0.5 0.1 -0.9</direction>
+        </light> -->
+        <light type="directional" name="sun2">
+            <cast_shadows>true</cast_shadows>
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>1 1 1 1</specular>
+            <ambient>1 1 1 1</ambient>
+            <attenuation>
+                <range>1000</range>
+                <constant>0.9</constant>
+                <linear>0.01</linear>
+                <quadratic>0.001</quadratic>
+            </attenuation>
+            <direction>0.5 0.1 -0.9</direction>
         </light>
-        <model name="ground_plane">
-            <static>true</static>
-            <link name="link">
-                <collision name="collision">
-                    <geometry>
-                        <plane>
-                            <normal>0 0 1</normal>
-                        </plane>
-                    </geometry>
-                </collision>
-                <visual name="visual">
-                    <geometry>
-                        <plane>
-                            <normal>0 0 1</normal>
-                            <size>100 100</size>
-                        </plane>
-                    </geometry>
-                    <material>
-                        <ambient>0.8 0.8 0.8 1</ambient>
-                        <diffuse>0.8 0.8 0.8 1</diffuse>
-                        <specular>0.8 0.8 0.8 1</specular>
-                    </material>
-                </visual>
-            </link>
-        </model>
+        <light type="directional" name="sun3">
+            <cast_shadows>true</cast_shadows>
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>1 1 1 1</specular>
+            <ambient>1 1 1 1</ambient>
+            <attenuation>
+                <range>1000</range>
+                <constant>0.9</constant>
+                <linear>0.01</linear>
+                <quadratic>0.001</quadratic>
+            </attenuation>
+            <direction>0.5 0.1 0.9</direction>
+        </light>
+        
     </world>
 </sdf>
