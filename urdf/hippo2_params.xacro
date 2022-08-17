@@ -4,4 +4,5 @@
     <xacro:property name="ixx" value="0.0024" />
     <xacro:property name="iyy" value="0.010717" />
     <xacro:property name="izz" value="0.010717" />
+    <xacro:property name="thruster_r" value="0.09" />
 </robot>
