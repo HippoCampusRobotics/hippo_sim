@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="thruster" params="suffix parent xyz axis cw">
+        <xacro:include filename="$(find hippo_sim)/urdf/thruster_params.xacro" />
 
         <xacro:property name="mount_link" value="${suffix}_thruster_mount_link" />
         <xacro:property name="mount_joint" value="${suffix}_thruster_mount_joint" />
@@ -13,8 +14,8 @@
         <link name="${mount_link}">
             <origin xyz="0 0 0" rpy="0 0 0" />
             <inertial>
-                <mass value="${base_mass}" />
-                <inertia ixx="${ixx}" ixy="0.0" ixz="0.0" iyy="${iyy}" iyz="0.0" izz="${izz}" />
+                <mass value="${thruster_mass}" />
+                <inertia ixx="${thruster_ixx}" ixy="0.0" ixz="0.0" iyy="${thruster_iyy}" iyz="0.0" izz="${thruster_izz}" />
             </inertial>
             <visual>
                 <geometry>
@@ -50,8 +51,8 @@
         <link name="${hull_link}">
             <origin xyz="0 0 0" rpy="0 0 0" />
             <inertial>
-                <mass value="${base_mass}" />
-                <inertia ixx="${ixx}" ixy="0.0" ixz="0.0" iyy="${iyy}" iyz="0.0" izz="${izz}" />
+                <mass value="${thruster_mass}" />
+                <inertia ixx="${thruster_ixx}" ixy="0.0" ixz="0.0" iyy="${thruster_iyy}" iyz="0.0" izz="${thruster_izz}" />
             </inertial>
             <visual>
                 <geometry>
@@ -87,8 +88,8 @@
         <link name="${propeller_link}">
             <origin xyz="0 0 0" rpy="0 0 0" />
             <inertial>
-                <mass value="${base_mass}" />
-                <inertia ixx="${ixx}" ixy="0.0" ixz="0.0" iyy="${iyy}" iyz="0.0" izz="${izz}" />
+                <mass value="${thruster_mass}" />
+                <inertia ixx="${thruster_ixx}" ixy="0.0" ixz="0.0" iyy="${thruster_iyy}" iyz="0.0" izz="${thruster_izz}" />
             </inertial>
             <visual>
                 <geometry>
