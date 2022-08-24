@@ -77,7 +77,8 @@
                 <ambient>1 1 1 1</ambient>
                 <diffuse>1 1 1 1</diffuse>
                 <specular>1 1 1 1</specular>
-                <pbr>grey
+                <pbr>
+                    grey
                     <metal>
                         <metalness>1</metalness>
                         <roughness>0.5</roughness>
@@ -103,5 +104,4 @@
     <xacro:thruster parent="base_link" suffix="starboard_top" xyz="0 ${thruster_r / 2**0.5} ${thruster_r / 2**0.5}" axis="1 0 0" cw="false" />
     <xacro:thruster parent="base_link" suffix="starboard_bot" xyz="0 ${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" axis="1 0 0" cw="true" />
     <xacro:thruster parent="base_link" suffix="port_bot" xyz="0 -${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" axis="1 0 0" cw="false" />
-
 </robot>
