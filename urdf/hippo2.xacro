@@ -3,10 +3,9 @@
     <xacro:include filename="$(find hippo_sim)/urdf/hippo2_params.xacro" />
     <xacro:include filename="$(find hippo_sim)/urdf/thruster_macro.xacro" />
     <gazebo>
-        <static>true</static>
+        <static>false</static>
     </gazebo>
     <link name="base_link">
-        <origin> xyz="0 0 0" rpy="0 0 0"</origin>
         <inertial>
             <mass value="${base_mass}" />
             <inertia ixx="${ixx}" ixy="0.0" ixz="0.0" iyy="${iyy}" iyz="0.0" izz="${izz}" />
@@ -58,6 +57,11 @@
     </gazebo>
 
     <gazebo reference="base_link">
+        <sensor name="imu_sensor" type="imu">
+            <always_on>1</always_on>
+            <visualize>true</visualize>
+            <topic>imu_topic</topic>
+        </sensor>
         <visual>
             <material>
                 <ambient>0.5 0.5 0.9 0.2</ambient>
