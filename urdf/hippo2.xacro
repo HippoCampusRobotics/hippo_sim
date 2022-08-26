@@ -104,4 +104,18 @@
     <xacro:thruster parent="base_link" suffix="starboard_top" xyz="0 ${thruster_r / 2**0.5} ${thruster_r / 2**0.5}" axis="1 0 0" cw="false" />
     <xacro:thruster parent="base_link" suffix="starboard_bot" xyz="0 ${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" axis="1 0 0" cw="true" />
     <xacro:thruster parent="base_link" suffix="port_bot" xyz="0 -${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" axis="1 0 0" cw="false" />
+
+    <gazebo>
+        <plugin filename="BuoyancyPlugin"
+        name="ignition::gazebo::systems::BuoyancyPlugin">
+        <buoyancy>
+            <link_name>base_link</link_name>
+            <origin>0 0 0.002</origin>
+            <force_added>0</force_added>
+            <compensation>1.01</compensation>
+            <height_scale_limit>0.1</height_scale_limit>
+        </buoyancy>
+      </plugin>
+
+    </gazebo>
 </robot>

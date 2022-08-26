@@ -31,7 +31,7 @@ def generate_launch_description():
         output='screen')
 
     gazebo = ExecuteProcess(
-        cmd=['ign', 'gazebo',
+        cmd=['ign', 'gazebo', '-v 3',
              str(world)],
         output='screen')
 
