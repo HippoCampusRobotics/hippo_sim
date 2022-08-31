@@ -117,5 +117,16 @@
         </buoyancy>
       </plugin>
 
+      <plugin filename="HydrodynamicsPlugin"
+      name="ignition::gazebo::systems::HydrodynamicsPlugin">
+      <hydrodynamics>
+        <link>base_link</link>
+        <added_mass_linear>1.11 2.8 2.8</added_mass_linear>
+        <added_mass_angular>0.00451 0.0163 0.0163</added_mass_angular>
+        <damping_linear>5.39 17.36 17.36</damping_linear>
+        <damping_angular>0.00114 0.007 0.007</damping_angular>
+      </hydrodynamics>
+    </plugin>
+
     </gazebo>
 </robot>
