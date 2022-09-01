@@ -13,7 +13,7 @@ IGNITION_ADD_PLUGIN_ALIAS(buoyancy::BuoyancyPlugin,
 
 using namespace buoyancy;
 
-BuoyancyPlugin::BuoyancyPlugin() {}
+BuoyancyPlugin::BuoyancyPlugin() : System() {}
 
 BuoyancyPlugin::~BuoyancyPlugin() {}
 

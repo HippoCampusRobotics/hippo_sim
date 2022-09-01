@@ -17,7 +17,7 @@ IGNITION_ADD_PLUGIN_ALIAS(hydrodynamics::HydrodynamicsPlugin,
 
 using namespace hydrodynamics;
 
-HydrodynamicsPlugin::HydrodynamicsPlugin() {}
+HydrodynamicsPlugin::HydrodynamicsPlugin() : System() {}
 HydrodynamicsPlugin::~HydrodynamicsPlugin() {}
 
 void HydrodynamicsPlugin::Configure(
