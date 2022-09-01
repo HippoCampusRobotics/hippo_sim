@@ -26,7 +26,7 @@
         <gazebo reference="${mount_link}">
             <visual>
                 <material>
-    
+
                     <ambient>1 1 1 1</ambient>
                     <diffuse>1 1 1 1</diffuse>
                     <specular>1 1 1 1</specular>
@@ -63,7 +63,7 @@
         <gazebo reference="${hull_link}">
             <visual>
                 <material>
-    
+
                     <ambient>1 1 1 1</ambient>
                     <diffuse>1 1 1 1</diffuse>
                     <specular>1 1 1 1</specular>
@@ -97,10 +97,23 @@
                 </geometry>
             </visual>
         </link>
+        <gazebo>
+            <plugin filename="ThrusterPlugin" name="ignition::gazebo::systems::ThrusterPlugin">
+                <thruster_config>
+                    <link>${propeller_link}</link>
+                    <joint>${propeller_joint}</joint>
+                    <linear_coeff>1e-5</linear_coeff>
+                    <quadratic_coeff>1e-5</quadratic_coeff>
+                    <torque_coeff>0.0024</torque_coeff>
+                    <rpm_scaler>10.0</rpm_scaler>
+                    <max_rpm>800</max_rpm>
+                </thruster_config>
+            </plugin>
+        </gazebo>
         <gazebo reference="${propeller_link}">
             <visual>
                 <material>
-    
+
                     <ambient>1 1 1 1</ambient>
                     <diffuse>1 1 1 1</diffuse>
                     <specular>1 1 1 1</specular>

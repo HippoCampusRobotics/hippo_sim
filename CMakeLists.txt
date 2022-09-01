@@ -39,6 +39,21 @@ install(TARGETS HydrodynamicsPlugin
   RUNTIME DESTINATION bin
 )
 
+add_library(ThrusterPlugin SHARED
+  plugin/thruster.cpp
+)
+
+ament_target_dependencies(ThrusterPlugin
+  ignition-plugin${IGN_PLUGIN_VER}
+  ignition-gazebo${IGN_GAZEBO_VER}
+)
+
+install(TARGETS ThrusterPlugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
 install(
   DIRECTORY launch meshes urdf world textures
   DESTINATION share/${PROJECT_NAME}
