@@ -41,12 +41,16 @@
                 </material>
             </visual>
         </gazebo>
-        <joint name="${mount_joint}" type="continuous">
+        <joint name="${mount_joint}" type="fixed">
             <axis xyz="${axis}" />
             <origin xyz="${xyz}" />
             <parent link="${parent}" />
             <child link="${mount_link}" />
         </joint>
+        <gazebo reference="${mount_joint}">
+            <disableFixedJointLumping>true</disableFixedJointLumping>
+            <preserveFixedJoint>true</preserveFixedJoint>
+        </gazebo>
 
         <link name="${hull_link}">
             <origin xyz="0 0 0" rpy="0 0 0" />
