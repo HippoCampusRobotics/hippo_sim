@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:macro name="thruster" params="suffix parent xyz axis cw">
+    <xacro:macro name="thruster" params="suffix parent xyz axis cw color number">
         <xacro:include filename="$(find hippo_sim)/urdf/thruster_params.xacro" />
 
         <xacro:property name="mount_link" value="${suffix}_thruster_mount_link" />
@@ -111,6 +111,7 @@
                     <torque_coeff>${torque_constant}</torque_coeff>
                     <rpm_scaler>${rpm_scaler}</rpm_scaler>
                     <max_rpm>${max_rpm}</max_rpm>
+                    <thruster_number>${number}</thruster_number>
                 </thruster_config>
             </plugin>
         </gazebo>
@@ -126,7 +127,7 @@
                             <metalness>1</metalness>
                             <roughness>0.3</roughness>
                             <environment_map>$(find hippo_sim)/textures/env_map.dds</environment_map>
-                            <albedo_map>$(find hippo_sim)/textures/red.png</albedo_map>
+                            <albedo_map>$(find hippo_sim)/textures/${color}.png</albedo_map>
                         </metal>
                     </pbr>
                 </material>

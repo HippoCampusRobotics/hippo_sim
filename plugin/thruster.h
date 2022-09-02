@@ -26,6 +26,10 @@ class ThrusterPlugin : public ignition::gazebo::System,
   void CreateJointComponents(ignition::gazebo::EntityComponentManager &_ecm,
                              ignition::gazebo::Entity _joint);
 
+  void CreateLinkComponents(ignition::gazebo::EntityComponentManager &_ecm);
+
+  void CreateParentLinkComponents(ignition::gazebo::EntityComponentManager &_ecm);
+
   std::unique_ptr<ThrusterPluginData> data_;
 };
 }  // namespace thruster

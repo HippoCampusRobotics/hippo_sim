@@ -1,10 +1,16 @@
 #include "thruster.h"
 
+#include <ignition/msgs/double.pb.h>
+
 #include <ignition/gazebo/Link.hh>
 #include <ignition/gazebo/Model.hh>
+#include <ignition/gazebo/components/ExternalWorldWrenchCmd.hh>
 #include <ignition/gazebo/components/Joint.hh>
+#include <ignition/gazebo/components/JointAxis.hh>
 #include <ignition/gazebo/components/JointVelocity.hh>
 #include <ignition/gazebo/components/JointVelocityCmd.hh>
+#include <ignition/gazebo/components/ParentLinkName.hh>
+#include <ignition/gazebo/components/Pose.hh>
 #include <ignition/plugin/Register.hh>
 #include <ignition/transport/Node.hh>
 
@@ -21,19 +27,62 @@ using namespace thruster;
 using namespace ignition;
 using namespace gazebo;
 
+namespace turning_direction {
+const static int CCW = 1;
+const static int CW = -1;
+};  // namespace turning_direction
+
 class thruster::ThrusterPluginData {
  public:
-  Model model_{kNullEntity};
-  Link link_{kNullEntity};
-  Entity joint_entity_{kNullEntity};
+  ignition::gazebo::Model model{kNullEntity};
+  Link link{kNullEntity};
+  Link parent_link{kNullEntity};
+  Entity joint_entity{kNullEntity};
 
-  transport::Node node_;
+  transport::Node node;
 
   double linear_coeff{0.0};
   double quadratic_coeff{0.0};
   double torque_constant{0.0};
   double rpm_scaler{10.0};
   double max_rpm{100.0};
+  int direction{turning_direction::CCW};
+
+  int thruster_number;
+
+  std::mutex thrust_cmd_mutex;
+  double thrust_cmd;
+
+  void OnThrustCmd(const ignition::msgs::Double &_msg) {
+    std::lock_guard<std::mutex> lock(thrust_cmd_mutex);
+    thrust_cmd = _msg.data();
+  }
+
+  double Thrust() {
+    double input;
+    {
+      std::lock_guard<std::mutex> lock(thrust_cmd_mutex);
+      input = thrust_cmd;
+    }
+    double thrust;
+    double tmp = std::abs(input);
+    thrust = tmp * tmp * quadratic_coeff + tmp * linear_coeff;
+    if (input < 0) {
+      thrust *= -1.0;
+    }
+    return direction * thrust;
+  }
+
+  double Torque(double thrust) { return -direction * thrust * torque_constant; }
+
+  double Speed() {
+    double input;
+    {
+      std::lock_guard<std::mutex> lock(thrust_cmd_mutex);
+      input = thrust_cmd;
+    }
+    return input * direction * max_rpm / 60.0 * 3.14 / rpm_scaler;
+  }
 };
 
 ThrusterPlugin::ThrusterPlugin()
@@ -45,8 +94,22 @@ void ThrusterPlugin::Configure(const ignition::gazebo::Entity &_entity,
                                const std::shared_ptr<const sdf::Element> &_sdf,
                                ignition::gazebo::EntityComponentManager &_ecm,
                                ignition::gazebo::EventManager &_eventMgr) {
-  data_->model_ = Model(_entity);
+  data_->model = ignition::gazebo::Model(_entity);
   ParseSdf(_sdf, _ecm);
+  const auto parent_name =
+      _ecm.Component<components::ParentLinkName>(data_->joint_entity)->Data();
+  const auto parent_entity = data_->model.LinkByName(_ecm, parent_name);
+  data_->parent_link = Link(parent_entity);
+
+  CreateJointComponents(_ecm, data_->joint_entity);
+  CreateLinkComponents(_ecm);
+  CreateParentLinkComponents(_ecm);
+
+  std::string topic_name = transport::TopicUtils::AsValidTopic(
+      "/" + data_->model.Name(_ecm) + "/thruster_" +
+      std::to_string(data_->thruster_number) + "/thrust");
+  data_->node.Subscribe(topic_name, &ThrusterPluginData::OnThrustCmd,
+                        data_.get());
 }
 
 void ThrusterPlugin::PreUpdate(const ignition::gazebo::UpdateInfo &_info,
@@ -54,12 +117,19 @@ void ThrusterPlugin::PreUpdate(const ignition::gazebo::UpdateInfo &_info,
   if (_info.paused) {
     return;
   }
+
+  auto pose = data_->link.WorldPose(_ecm);
+  double thrust = data_->Thrust();
+  math::Vector3d force(thrust, 0.0, 0.0);
+  data_->link.AddWorldForce(_ecm, pose->Rot().RotateVector(force));
+
   auto velocity =
-      _ecm.Component<components::JointVelocityCmd>(data_->joint_entity_);
+      _ecm.Component<components::JointVelocityCmd>(data_->joint_entity);
   if (velocity == nullptr) {
-    CreateJointComponents(_ecm, data_->joint_entity_);
+    CreateJointComponents(_ecm, data_->joint_entity);
   } else if (!velocity->Data().empty()) {
-    velocity->Data()[0] = 3.14;
+    double speed = data_->Speed();
+    velocity->Data()[0] = speed;
   } else {
     ignerr << ":-(" << std::endl;
   }
@@ -85,7 +155,7 @@ void ThrusterPlugin::ParseThrusterParams(
   name = "link";
   if (_element->HasElement(name)) {
     std::string link_name = _element->Get<std::string>(name);
-    data_->link_ = Link(data_->model_.LinkByName(_ecm, link_name));
+    data_->link = Link(data_->model.LinkByName(_ecm, link_name));
   } else {
     SDF_MISSING_ELEMENT(name);
   }
@@ -93,9 +163,8 @@ void ThrusterPlugin::ParseThrusterParams(
   name = "joint";
   if (_element->HasElement(name)) {
     std::string joint_name = _element->Get<std::string>(name);
-    data_->joint_entity_ = data_->model_.JointByName(_ecm, joint_name);
-    if (data_->joint_entity_ != kNullEntity) {
-      CreateJointComponents(_ecm, data_->joint_entity_);
+    data_->joint_entity = data_->model.JointByName(_ecm, joint_name);
+    if (data_->joint_entity != kNullEntity) {
     } else {
       ignerr << "Joint with name [" << joint_name << "] not found!"
              << std::endl;
@@ -138,6 +207,13 @@ void ThrusterPlugin::ParseThrusterParams(
   } else {
     SDF_MISSING_ELEMENT(name);
   }
+
+  name = "thruster_number";
+  if (_element->HasElement(name)) {
+    data_->thruster_number = _element->Get<int>(name);
+  } else {
+    SDF_MISSING_ELEMENT(name);
+  }
 }
 
 void ThrusterPlugin::CreateJointComponents(
@@ -145,13 +221,32 @@ void ThrusterPlugin::CreateJointComponents(
     ignition::gazebo::Entity _joint) {
   if (!_ecm.EntityHasComponentType(_joint,
                                    components::JointVelocity().TypeId())) {
-    _ecm.CreateComponent(data_->joint_entity_,
-                         components::JointVelocity({0.0}));
+    _ecm.CreateComponent(data_->joint_entity, components::JointVelocity({0.0}));
   }
 
   if (!_ecm.EntityHasComponentType(_joint,
                                    components::JointVelocityCmd().TypeId())) {
-    _ecm.CreateComponent(data_->joint_entity_,
+    _ecm.CreateComponent(data_->joint_entity,
                          components::JointVelocityCmd({0.0}));
+  }
+}
+
+void ThrusterPlugin::CreateLinkComponents(
+    ignition::gazebo::EntityComponentManager &_ecm) {
+  if (!_ecm.Component<components::WorldPose>(data_->link.Entity())) {
+    _ecm.CreateComponent(data_->link.Entity(), components::WorldPose());
+  }
+}
+
+void ThrusterPlugin::CreateParentLinkComponents(
+    ignition::gazebo::EntityComponentManager &_ecm) {
+  if (!_ecm.Component<components::WorldPose>(data_->parent_link.Entity())) {
+    _ecm.CreateComponent(data_->parent_link.Entity(), components::WorldPose());
+  }
+
+  if (!_ecm.Component<components::ExternalWorldWrenchCmd>(
+          data_->parent_link.Entity())) {
+    _ecm.CreateComponent(data_->parent_link.Entity(),
+                         components::ExternalWorldWrenchCmd());
   }
 }

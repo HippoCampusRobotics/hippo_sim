@@ -4,8 +4,8 @@
     <xacro:property name="thruster_ixx" value="1e-6" />
     <xacro:property name="thruster_iyy" value="1e-6" />
     <xacro:property name="thruster_izz" value="1e-6" />
-    <xacro:property name="thrust_linear_coeff" value="15.89" />
-    <xacro:property name="thrust_quadratic_coeff" value="23.2" />
+    <xacro:property name="thrust_linear_coeff" value="15.89e-2" />
+    <xacro:property name="thrust_quadratic_coeff" value="23.2e-2" />
     <xacro:property name="torque_constant" value="10.0" />
     <xacro:property name="rpm_scaler" value="10.0" />
     <xacro:property name="max_rpm" value="800" />
