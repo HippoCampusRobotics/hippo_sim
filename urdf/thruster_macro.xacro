@@ -106,11 +106,11 @@
                 <thruster_config>
                     <link>${propeller_link}</link>
                     <joint>${propeller_joint}</joint>
-                    <linear_coeff>1e-5</linear_coeff>
-                    <quadratic_coeff>1e-5</quadratic_coeff>
-                    <torque_coeff>0.0024</torque_coeff>
-                    <rpm_scaler>10.0</rpm_scaler>
-                    <max_rpm>800</max_rpm>
+                    <linear_coeff>${thrust_linear_coeff}</linear_coeff>
+                    <quadratic_coeff>${thrust_quadratic_coeff}</quadratic_coeff>
+                    <torque_coeff>${torque_constant}</torque_coeff>
+                    <rpm_scaler>${rpm_scaler}</rpm_scaler>
+                    <max_rpm>${max_rpm}</max_rpm>
                 </thruster_config>
             </plugin>
         </gazebo>
