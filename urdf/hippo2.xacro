@@ -2,6 +2,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="hippocampus">
     <xacro:include filename="$(find hippo_sim)/urdf/hippo2_params.xacro" />
     <xacro:include filename="$(find hippo_sim)/urdf/thruster_macro.xacro" />
+    <xacro:include filename="$(find hippo_sim)/urdf/hippo2_args.xacro" />
     <gazebo>
         <static>false</static>
     </gazebo>
@@ -60,7 +61,7 @@
         <sensor name="imu_sensor" type="imu">
             <always_on>1</always_on>
             <visualize>true</visualize>
-            <topic>imu_topic</topic>
+            <topic>$(arg imu_topic)</topic>
         </sensor>
         <visual>
             <material>

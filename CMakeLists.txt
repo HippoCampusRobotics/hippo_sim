@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(hippo_sim)
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(gflags REQUIRED)
 
@@ -39,6 +40,12 @@ install(TARGETS
 install(
   DIRECTORY launch meshes urdf world textures
   DESTINATION share/${PROJECT_NAME}
+)
+
+# Install Python executables
+install(PROGRAMS
+  scripts/create_robot_description.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

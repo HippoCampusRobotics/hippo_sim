@@ -8,7 +8,6 @@ from launch_ros.actions import PushRosNamespace
 
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
-# import xacro
 
 
 def generate_launch_description():
@@ -26,12 +25,25 @@ def generate_launch_description():
         default_value=default_vehicle_name,
         description='Vehicle name used as namespace.')
 
-    robot_description = ParameterValue(Command(
-        ['xacro ', LaunchConfiguration('model_path')]),
-                                       value_type=str)
+    imu_topic = LaunchConfiguration(
+        'imu_topic', default=['/',
+                              LaunchConfiguration('vehicle_name'), '/imu'])
+
+    # PathJoinSubstitution(LaunchConfiguration('model_path'))
+    robot_description = LaunchConfiguration(
+        'robot_description',
+        default=Command([
+            'ros2 run hippo_sim create_robot_description.py ', '--input ',
+            LaunchConfiguration('model_path'), ' --mappings \'{"imu_topic": "',
+            imu_topic, '"}\''
+        ]))
     params = {'robot_description': robot_description}
 
     bridge_args = []
+    bridge_args.append(
+        LaunchConfiguration(
+            'imu_bridge',
+            default=[imu_topic, '@sensor_msgs/msg/Imu[ignition.msgs.IMU']))
     for i in range(4):
         bridge_args.append(
             LaunchConfiguration(
