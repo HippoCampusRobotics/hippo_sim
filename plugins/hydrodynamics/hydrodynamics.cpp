@@ -71,7 +71,6 @@ void HydrodynamicsPlugin::ParseHydrodynamics(
   name = "added_mass_linear";
   if (_element->HasElement(name)) {
     added_mass_linear_ = _element->Get<ignition::math::Vector3d>(name);
-    ignerr << "Added mass linear : " << added_mass_linear_ << std::endl;
   } else {
     SDF_MISSING_ELEMENT(name);
   }
@@ -79,7 +78,6 @@ void HydrodynamicsPlugin::ParseHydrodynamics(
   name = "added_mass_angular";
   if (_element->HasElement(name)) {
     added_mass_angular_ = _element->Get<ignition::math::Vector3d>(name);
-    ignerr << "Added mass angular : " << added_mass_angular_ << std::endl;
   } else {
     SDF_MISSING_ELEMENT(name);
   }
@@ -87,7 +85,6 @@ void HydrodynamicsPlugin::ParseHydrodynamics(
   name = "damping_linear";
   if (_element->HasElement(name)) {
     auto damping = _element->Get<ignition::math::Vector3d>(name);
-    ignerr << "Linear damping: " << damping << std::endl;
     damping_linear_(0, 0) = -damping.X();
     damping_linear_(1, 1) = -damping.Y();
     damping_linear_(2, 2) = -damping.Z();
@@ -98,7 +95,6 @@ void HydrodynamicsPlugin::ParseHydrodynamics(
   name = "damping_angular";
   if (_element->HasElement(name)) {
     auto damping = _element->Get<ignition::math::Vector3d>(name);
-    ignerr << "Angular damping: " << damping << std::endl;
     damping_angular_(0, 0) = -damping.X();
     damping_angular_(1, 1) = -damping.Y();
     damping_angular_(2, 2) = -damping.Z();
