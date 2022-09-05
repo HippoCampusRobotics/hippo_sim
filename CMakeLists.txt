@@ -3,6 +3,7 @@ project(hippo_sim)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(gflags REQUIRED)
 
 find_package(ignition-plugin1 REQUIRED COMPONENTS register)
 set(GZ_PLUGIN_VER ${ignition-plugin1_VERSION_MAJOR})
@@ -18,6 +19,22 @@ set(GZ_TRANSPORT_VER ${ignition-transport11_VERSION_MAJOR})
 add_subdirectory(plugins/buoyancy)
 add_subdirectory(plugins/hydrodynamics)
 add_subdirectory(plugins/thruster)
+
+add_executable(spawn src/spawn.cpp)
+ament_target_dependencies(spawn
+  rclcpp
+)
+target_link_libraries(spawn
+  gflags
+  ignition-math${GZ_MATH_VER}::core
+  ignition-msgs${GZ_MSGS_VER}::core
+  ignition-transport${GZ_TRANSPORT_VER}::core
+)
+
+install(TARGETS
+  spawn
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 install(
   DIRECTORY launch meshes urdf world textures
