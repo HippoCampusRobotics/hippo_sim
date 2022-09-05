@@ -3,8 +3,9 @@ add_library(HydrodynamicsPlugin SHARED
 )
 
 ament_target_dependencies(HydrodynamicsPlugin
-  ignition-plugin${IGN_PLUGIN_VER}
-  ignition-gazebo${IGN_GAZEBO_VER}
+  ignition-plugin${GZ_PLUGIN_VER}
+  ignition-gazebo${GZ_GAZEBO_VER}
+  ignition-math${GZ_MATH_VER}
 )
 
 install(TARGETS HydrodynamicsPlugin

@@ -3,8 +3,10 @@ add_library(ThrusterPlugin SHARED
 )
 
 ament_target_dependencies(ThrusterPlugin
-  ignition-plugin${IGN_PLUGIN_VER}
-  ignition-gazebo${IGN_GAZEBO_VER}
+  ignition-plugin${GZ_PLUGIN_VER}
+  ignition-gazebo${GZ_GAZEBO_VER}
+  ignition-transport${GZ_TRANSPORT_VER}
+  ignition-math${GZ_MATH_VER}
 )
 
 install(TARGETS ThrusterPlugin
