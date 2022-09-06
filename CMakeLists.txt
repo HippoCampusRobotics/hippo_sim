@@ -5,6 +5,7 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(gflags REQUIRED)
+find_package(ros_ign_bridge REQUIRED)
 
 find_package(ignition-plugin1 REQUIRED COMPONENTS register)
 set(GZ_PLUGIN_VER ${ignition-plugin1_VERSION_MAJOR})
@@ -34,6 +35,17 @@ target_link_libraries(spawn
 
 install(TARGETS
   spawn
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+add_executable(bridge src/static_bridge.cpp)
+ament_target_dependencies(bridge
+  rclcpp
+  ros_ign_bridge
+  ignition-transport${GZ_TRANSPORT_VER}
+)
+
+install(TARGETS bridge
   DESTINATION lib/${PROJECT_NAME}
 )
 

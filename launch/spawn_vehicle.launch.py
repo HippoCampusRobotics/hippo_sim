@@ -39,21 +39,6 @@ def generate_launch_description():
         ]))
     params = {'robot_description': robot_description}
 
-    bridge_args = []
-    bridge_args.append(
-        LaunchConfiguration(
-            'imu_bridge',
-            default=[imu_topic, '@sensor_msgs/msg/Imu[ignition.msgs.IMU']))
-    for i in range(4):
-        bridge_args.append(
-            LaunchConfiguration(
-                f'bridge_thruster_{i}',
-                default=[
-                    '/',
-                    LaunchConfiguration('vehicle_name'),
-                    f'/thruster_{i}/thrust@std_msgs/msg/Float64]ignition.msgs.Double'
-                ]))
-
     vehicle_group = GroupAction([
         PushRosNamespace(LaunchConfiguration('vehicle_name')),
         Node(package='hippo_sim',
@@ -61,10 +46,7 @@ def generate_launch_description():
              parameters=[params],
              arguments=['--param', 'robot_description'],
              output='screen'),
-        Node(package='ros_ign_bridge',
-             executable='parameter_bridge',
-             arguments=bridge_args,
-             output='screen'),
+        Node(package='hippo_sim', executable='bridge', output='screen'),
     ])
 
     gazebo = ExecuteProcess(cmd=['ign', 'gazebo', '-v 1',
