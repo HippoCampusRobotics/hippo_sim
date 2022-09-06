@@ -32,6 +32,30 @@ const static int CCW = -1;
 const static int CW = 1;
 };  // namespace turning_direction
 
+template <typename T>
+class FirstOrderFilter {
+ public:
+  FirstOrderFilter(double _tau_up, double _tau_down, T _state)
+      : tau_up_(_tau_up), tau_down_(_tau_down), state_(_state) {}
+  T Update(T _state, double _dt) {
+    T output;
+    double alpha;
+    if (_state > state_) {
+      alpha = exp(-_dt / tau_up_);
+    } else {
+      alpha = exp(-_dt / tau_down_);
+    }
+    output = alpha * state_ + (1.0 - alpha) * _state;
+    state_ = output;
+    return output;
+  }
+
+ private:
+  double tau_up_;
+  double tau_down_;
+  T state_;
+};
+
 class thruster::ThrusterPluginData {
  public:
   ignition::gazebo::Model model_{kNullEntity};
@@ -48,15 +72,45 @@ class thruster::ThrusterPluginData {
   double max_rpm{100.0};
   int turning_direction{turning_direction::CCW};
   int propeller_direction{turning_direction::CCW};
+  double timeconstant_up{0.0};
+  double timeconstant_down{0.0};
 
   int thruster_number;
 
   std::mutex thrust_cmd_mutex;
-  double thrust_cmd;
+  double thrust_cmd{0.0};
+  double rotor_velocity_setpoint{0.0};
+  double rotor_velocity{0.0};
+
+  std::unique_ptr<FirstOrderFilter<double>> rotor_velocity_filter_;
 
   void OnThrustCmd(const ignition::msgs::Double &_msg) {
     std::lock_guard<std::mutex> lock(thrust_cmd_mutex);
     thrust_cmd = _msg.data();
+    rotor_velocity_setpoint = ThrustToVelocity(thrust_cmd);
+  }
+
+  double RotorVelocity(EntityComponentManager &_ecm) {
+    auto velocity_component =
+        _ecm.Component<components::JointVelocity>(joint_entity_);
+    if (!velocity_component) {
+      ignerr << "Joint has no velocity component!" << std::endl;
+      return 0.0;
+    } else if (!velocity_component->Data().empty()) {
+      return velocity_component->Data()[0] * rpm_scaler;
+    }
+    ignerr << "Joint velocity data is empty!" << std::endl;
+    return 0.0;
+  }
+
+  void SetRotorVelocity(EntityComponentManager &_ecm, double velocity) {
+    auto velocity_component =
+        _ecm.Component<components::JointVelocityCmd>(joint_entity_);
+    if (!velocity_component) {
+      CreateJointComponents(_ecm, joint_entity_);
+    } else if (!velocity_component->Data().empty()) {
+      velocity_component->Data()[0] = velocity / rpm_scaler;
+    }
   }
 
   void ApplyThrustAndTorque(EntityComponentManager &_ecm) {
@@ -76,14 +130,17 @@ class thruster::ThrusterPluginData {
     }
   }
 
-  void UpdateSpeed(EntityComponentManager &_ecm) {
-    auto velocity_component =
-        _ecm.Component<components::JointVelocityCmd>(joint_entity_);
-    if (!velocity_component) {
-      CreateJointComponents(_ecm, joint_entity_);
-    } else if (!velocity_component->Data().empty()) {
-      velocity_component->Data()[0] = Speed();
+  double ThrustToVelocity(double thrust) {
+    return thrust * turning_direction * max_rpm / 60.0 * 3.14;
+  }
+
+  void UpdateRotorVelocity(EntityComponentManager &_ecm, double dt) {
+    {
+      std::lock_guard<std::mutex> lock(thrust_cmd_mutex);
+      rotor_velocity =
+          rotor_velocity_filter_->Update(rotor_velocity_setpoint, dt);
     }
+    SetRotorVelocity(_ecm, rotor_velocity);
   }
 
   void CreateJointComponents(ignition::gazebo::EntityComponentManager &_ecm,
@@ -120,15 +177,10 @@ class thruster::ThrusterPluginData {
 
  private:
   math::Vector3d Thrust() {
-    double input;
-    {
-      std::lock_guard<std::mutex> lock(thrust_cmd_mutex);
-      input = thrust_cmd;
-    }
     double thrust;
-    double tmp = std::abs(input);
+    double tmp = std::abs(rotor_velocity);
     thrust = tmp * tmp * quadratic_coeff + tmp * linear_coeff;
-    if (input < 0) {
+    if (rotor_velocity < 0) {
       thrust *= -1.0;
     }
     double force = turning_direction * propeller_direction * thrust;
@@ -166,6 +218,10 @@ void ThrusterPlugin::Configure(const ignition::gazebo::Entity &_entity,
   const auto parent_entity = data_->model_.LinkByName(_ecm, parent_name);
   data_->parent_link_ = Link(parent_entity);
 
+  data_->rotor_velocity_filter_ = std::make_unique<FirstOrderFilter<double>>(
+      data_->timeconstant_up, data_->timeconstant_down,
+      data_->rotor_velocity_setpoint);
+
   data_->CreateJointComponents(_ecm, data_->joint_entity_);
   data_->CreateLinkComponents(_ecm);
   data_->CreateParentLinkComponents(_ecm);
@@ -183,8 +239,8 @@ void ThrusterPlugin::PreUpdate(const ignition::gazebo::UpdateInfo &_info,
     return;
   }
 
+  data_->UpdateRotorVelocity(_ecm, std::chrono::duration<double>(_info.dt).count());
   data_->ApplyThrustAndTorque(_ecm);
-  data_->UpdateSpeed(_ecm);
 }
 
 void ThrusterPlugin::ParseSdf(const std::shared_ptr<const sdf::Element> &_sdf,
@@ -287,6 +343,20 @@ void ThrusterPlugin::ParseThrusterParams(
     } else {
       data_->propeller_direction = turning_direction::CCW;
     }
+  } else {
+    SDF_MISSING_ELEMENT(name);
+  }
+
+  name = "timeconstant_up";
+  if (_element->HasElement(name)) {
+    data_->timeconstant_up = _element->Get<double>(name);
+  } else {
+    SDF_MISSING_ELEMENT(name);
+  }
+
+  name = "timeconstant_down";
+  if (_element->HasElement(name)) {
+    data_->timeconstant_down = _element->Get<double>(name);
   } else {
     SDF_MISSING_ELEMENT(name);
   }

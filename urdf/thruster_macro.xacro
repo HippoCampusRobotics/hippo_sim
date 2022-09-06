@@ -52,7 +52,7 @@
             <preserveFixedJoint>true</preserveFixedJoint>
         </gazebo>
 
-        <!-- <link name="${hull_link}">
+        <link name="${hull_link}">
             <origin xyz="0 0 0" rpy="0 0 0" />
             <inertial>
                 <mass value="${thruster_mass}" />
@@ -87,7 +87,7 @@
             <origin xyz="${xyz}" />
             <parent link="${parent}" />
             <child link="${hull_link}" />
-        </joint> -->
+        </joint>
 
         <link name="${propeller_link}">
             <origin xyz="0 0 0" rpy="0 0 0" />
@@ -114,6 +114,8 @@
                     <thruster_number>${number}</thruster_number>
                     <turning_direction>${turning_direction}</turning_direction>
                     <propeller_direction>${propeller_direction}</propeller_direction>
+                    <timeconstant_up>${timeconstant_up}</timeconstant_up>
+                    <timeconstant_down>${timeconstant_down}</timeconstant_down>
                 </thruster_config>
             </plugin>
         </gazebo>
