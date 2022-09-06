@@ -34,8 +34,8 @@ def generate_launch_description():
         'robot_description',
         default=Command([
             'ros2 run hippo_sim create_robot_description.py ', '--input ',
-            LaunchConfiguration('model_path'), ' --mappings \'{"imu_topic": "',
-            imu_topic, '"}\''
+            LaunchConfiguration('model_path'), ' --mappings imu_topic=',
+            imu_topic
         ]))
     params = {'robot_description': robot_description}
 
