@@ -107,7 +107,7 @@ class thruster::ThrusterPluginData {
     auto velocity_component =
         _ecm.Component<components::JointVelocityCmd>(joint_entity_);
     if (!velocity_component) {
-      CreateJointComponents(_ecm, joint_entity_);
+      CreateJointComponents(_ecm);
     } else if (!velocity_component->Data().empty()) {
       velocity_component->Data()[0] = velocity / rpm_scaler;
     }
@@ -143,36 +143,10 @@ class thruster::ThrusterPluginData {
     SetRotorVelocity(_ecm, rotor_velocity);
   }
 
-  void CreateJointComponents(ignition::gazebo::EntityComponentManager &_ecm,
-                             ignition::gazebo::Entity _joint) {
-    if (!_ecm.EntityHasComponentType(_joint,
-                                     components::JointVelocity().TypeId())) {
-      _ecm.CreateComponent(joint_entity_, components::JointVelocity({0.0}));
-    }
-
-    if (!_ecm.EntityHasComponentType(_joint,
-                                     components::JointVelocityCmd().TypeId())) {
-      _ecm.CreateComponent(joint_entity_, components::JointVelocityCmd({0.0}));
-    }
-  }
-
-  void CreateLinkComponents(ignition::gazebo::EntityComponentManager &_ecm) {
-    if (!_ecm.Component<components::WorldPose>(link_.Entity())) {
-      _ecm.CreateComponent(link_.Entity(), components::WorldPose());
-    }
-  }
-
-  void CreateParentLinkComponents(
-      ignition::gazebo::EntityComponentManager &_ecm) {
-    if (!_ecm.Component<components::WorldPose>(parent_link_.Entity())) {
-      _ecm.CreateComponent(parent_link_.Entity(), components::WorldPose());
-    }
-
-    if (!_ecm.Component<components::ExternalWorldWrenchCmd>(
-            parent_link_.Entity())) {
-      _ecm.CreateComponent(parent_link_.Entity(),
-                           components::ExternalWorldWrenchCmd());
-    }
+  void CreateComponents(ignition::gazebo::EntityComponentManager &_ecm) {
+    CreateJointComponents(_ecm);
+    CreateLinkComponents(_ecm);
+    CreateParentLinkComponents(_ecm);
   }
 
  private:
@@ -200,6 +174,37 @@ class thruster::ThrusterPluginData {
     }
     return input * turning_direction * max_rpm / 60.0 * 3.14 / rpm_scaler;
   }
+
+  void CreateJointComponents(ignition::gazebo::EntityComponentManager &_ecm) {
+    if (!_ecm.EntityHasComponentType(joint_entity_,
+                                     components::JointVelocity().TypeId())) {
+      _ecm.CreateComponent(joint_entity_, components::JointVelocity({0.0}));
+    }
+
+    if (!_ecm.EntityHasComponentType(joint_entity_,
+                                     components::JointVelocityCmd().TypeId())) {
+      _ecm.CreateComponent(joint_entity_, components::JointVelocityCmd({0.0}));
+    }
+  }
+
+  void CreateLinkComponents(ignition::gazebo::EntityComponentManager &_ecm) {
+    if (!_ecm.Component<components::WorldPose>(link_.Entity())) {
+      _ecm.CreateComponent(link_.Entity(), components::WorldPose());
+    }
+  }
+
+  void CreateParentLinkComponents(
+      ignition::gazebo::EntityComponentManager &_ecm) {
+    if (!_ecm.Component<components::WorldPose>(parent_link_.Entity())) {
+      _ecm.CreateComponent(parent_link_.Entity(), components::WorldPose());
+    }
+
+    if (!_ecm.Component<components::ExternalWorldWrenchCmd>(
+            parent_link_.Entity())) {
+      _ecm.CreateComponent(parent_link_.Entity(),
+                           components::ExternalWorldWrenchCmd());
+    }
+  }
 };
 
 ThrusterPlugin::ThrusterPlugin()
@@ -222,9 +227,7 @@ void ThrusterPlugin::Configure(const ignition::gazebo::Entity &_entity,
       data_->timeconstant_up, data_->timeconstant_down,
       data_->rotor_velocity_setpoint);
 
-  data_->CreateJointComponents(_ecm, data_->joint_entity_);
-  data_->CreateLinkComponents(_ecm);
-  data_->CreateParentLinkComponents(_ecm);
+  data_->CreateComponents(_ecm);
 
   std::string topic_name = transport::TopicUtils::AsValidTopic(
       "/" + data_->model_.Name(_ecm) + "/thruster_" +
@@ -239,7 +242,8 @@ void ThrusterPlugin::PreUpdate(const ignition::gazebo::UpdateInfo &_info,
     return;
   }
 
-  data_->UpdateRotorVelocity(_ecm, std::chrono::duration<double>(_info.dt).count());
+  data_->UpdateRotorVelocity(_ecm,
+                             std::chrono::duration<double>(_info.dt).count());
   data_->ApplyThrustAndTorque(_ecm);
 }
 
