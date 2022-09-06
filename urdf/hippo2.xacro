@@ -100,16 +100,16 @@
         </visual>
     </gazebo>
 
-    <xacro:thruster parent="base_link" suffix="port_top" xyz="0 -${thruster_r / 2**0.5} ${thruster_r / 2**0.5}" axis="1 0 0" cw="true" color="red" number="0" />
-    <xacro:thruster parent="base_link" suffix="starboard_top" xyz="0 ${thruster_r / 2**0.5} ${thruster_r / 2**0.5}" axis="1 0 0" cw="false" color="green" number="1" />
-    <xacro:thruster parent="base_link" suffix="starboard_bot" xyz="0 ${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" axis="1 0 0" cw="true" color="grey" number="2" />
-    <xacro:thruster parent="base_link" suffix="port_bot" xyz="0 -${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" axis="1 0 0" cw="false" color="grey" number="3" />
+    <xacro:thruster parent="base_link" suffix="port_top" xyz="0 ${thruster_r / 2**0.5} ${thruster_r / 2**0.5}" axis="1 0 0" turning_direction="cw" propeller_direction="cw" color="red" number="0" />
+    <xacro:thruster parent="base_link" suffix="starboard_top" xyz="0 -${thruster_r / 2**0.5} ${thruster_r / 2**0.5}" axis="1 0 0" turning_direction="cw" propeller_direction="ccw" color="green" number="1" />
+    <xacro:thruster parent="base_link" suffix="starboard_bot" xyz="0 -${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" axis="1 0 0" turning_direction="cw" propeller_direction="cw" color="grey" number="2" />
+    <xacro:thruster parent="base_link" suffix="port_bot" xyz="0 ${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" axis="1 0 0" turning_direction="cw" propeller_direction="ccw" color="grey" number="3" />
 
     <gazebo>
         <plugin filename="BuoyancyPlugin" name="ignition::gazebo::systems::BuoyancyPlugin">
             <buoyancy>
                 <link_name>base_link</link_name>
-                <origin>0 0 0.002</origin>
+                <origin>0 0 0.000</origin>
                 <force_added>0</force_added>
                 <compensation>1.01</compensation>
                 <height_scale_limit>0.1</height_scale_limit>

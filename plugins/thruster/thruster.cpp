@@ -28,16 +28,16 @@ using namespace ignition;
 using namespace gazebo;
 
 namespace turning_direction {
-const static int CCW = 1;
-const static int CW = -1;
+const static int CCW = -1;
+const static int CW = 1;
 };  // namespace turning_direction
 
 class thruster::ThrusterPluginData {
  public:
-  ignition::gazebo::Model model{kNullEntity};
-  Link link{kNullEntity};
-  Link parent_link{kNullEntity};
-  Entity joint_entity{kNullEntity};
+  ignition::gazebo::Model model_{kNullEntity};
+  Link link_{kNullEntity};
+  Link parent_link_{kNullEntity};
+  Entity joint_entity_{kNullEntity};
 
   transport::Node node;
 
@@ -46,7 +46,8 @@ class thruster::ThrusterPluginData {
   double torque_constant{0.0};
   double rpm_scaler{10.0};
   double max_rpm{100.0};
-  int direction{turning_direction::CCW};
+  int turning_direction{turning_direction::CCW};
+  int propeller_direction{turning_direction::CCW};
 
   int thruster_number;
 
@@ -58,7 +59,67 @@ class thruster::ThrusterPluginData {
     thrust_cmd = _msg.data();
   }
 
-  double Thrust() {
+  void ApplyThrustAndTorque(EntityComponentManager &_ecm) {
+    auto pose = link_.WorldPose(_ecm);
+    auto parent_pose = parent_link_.WorldPose(_ecm);
+    auto pose_diff = *pose - *parent_pose;
+    link_.AddWorldForce(_ecm, pose->Rot().RotateVector(Thrust()));
+    auto parent_wrench_component =
+        _ecm.Component<components::ExternalWorldWrenchCmd>(
+            parent_link_.Entity());
+    auto parent_torque = pose_diff.Rot().RotateVector(Torque());
+    auto parent_torque_world = parent_pose->Rot().RotateVector(parent_torque);
+    if (parent_wrench_component) {
+      msgs::Set(parent_wrench_component->Data().mutable_torque(),
+                msgs::Convert(parent_wrench_component->Data().torque()) +
+                    parent_torque_world);
+    }
+  }
+
+  void UpdateSpeed(EntityComponentManager &_ecm) {
+    auto velocity_component =
+        _ecm.Component<components::JointVelocityCmd>(joint_entity_);
+    if (!velocity_component) {
+      CreateJointComponents(_ecm, joint_entity_);
+    } else if (!velocity_component->Data().empty()) {
+      velocity_component->Data()[0] = Speed();
+    }
+  }
+
+  void CreateJointComponents(ignition::gazebo::EntityComponentManager &_ecm,
+                             ignition::gazebo::Entity _joint) {
+    if (!_ecm.EntityHasComponentType(_joint,
+                                     components::JointVelocity().TypeId())) {
+      _ecm.CreateComponent(joint_entity_, components::JointVelocity({0.0}));
+    }
+
+    if (!_ecm.EntityHasComponentType(_joint,
+                                     components::JointVelocityCmd().TypeId())) {
+      _ecm.CreateComponent(joint_entity_, components::JointVelocityCmd({0.0}));
+    }
+  }
+
+  void CreateLinkComponents(ignition::gazebo::EntityComponentManager &_ecm) {
+    if (!_ecm.Component<components::WorldPose>(link_.Entity())) {
+      _ecm.CreateComponent(link_.Entity(), components::WorldPose());
+    }
+  }
+
+  void CreateParentLinkComponents(
+      ignition::gazebo::EntityComponentManager &_ecm) {
+    if (!_ecm.Component<components::WorldPose>(parent_link_.Entity())) {
+      _ecm.CreateComponent(parent_link_.Entity(), components::WorldPose());
+    }
+
+    if (!_ecm.Component<components::ExternalWorldWrenchCmd>(
+            parent_link_.Entity())) {
+      _ecm.CreateComponent(parent_link_.Entity(),
+                           components::ExternalWorldWrenchCmd());
+    }
+  }
+
+ private:
+  math::Vector3d Thrust() {
     double input;
     {
       std::lock_guard<std::mutex> lock(thrust_cmd_mutex);
@@ -70,10 +131,14 @@ class thruster::ThrusterPluginData {
     if (input < 0) {
       thrust *= -1.0;
     }
-    return direction * thrust;
+    double force = turning_direction * propeller_direction * thrust;
+    return math::Vector3d(force, 0, 0);
   }
 
-  double Torque(double thrust) { return -direction * thrust * torque_constant; }
+  math::Vector3d Torque() {
+    return -turning_direction * propeller_direction * Thrust() *
+           torque_constant;
+  }
 
   double Speed() {
     double input;
@@ -81,7 +146,7 @@ class thruster::ThrusterPluginData {
       std::lock_guard<std::mutex> lock(thrust_cmd_mutex);
       input = thrust_cmd;
     }
-    return input * direction * max_rpm / 60.0 * 3.14 / rpm_scaler;
+    return input * turning_direction * max_rpm / 60.0 * 3.14 / rpm_scaler;
   }
 };
 
@@ -94,19 +159,19 @@ void ThrusterPlugin::Configure(const ignition::gazebo::Entity &_entity,
                                const std::shared_ptr<const sdf::Element> &_sdf,
                                ignition::gazebo::EntityComponentManager &_ecm,
                                ignition::gazebo::EventManager &_eventMgr) {
-  data_->model = ignition::gazebo::Model(_entity);
+  data_->model_ = ignition::gazebo::Model(_entity);
   ParseSdf(_sdf, _ecm);
   const auto parent_name =
-      _ecm.Component<components::ParentLinkName>(data_->joint_entity)->Data();
-  const auto parent_entity = data_->model.LinkByName(_ecm, parent_name);
-  data_->parent_link = Link(parent_entity);
+      _ecm.Component<components::ParentLinkName>(data_->joint_entity_)->Data();
+  const auto parent_entity = data_->model_.LinkByName(_ecm, parent_name);
+  data_->parent_link_ = Link(parent_entity);
 
-  CreateJointComponents(_ecm, data_->joint_entity);
-  CreateLinkComponents(_ecm);
-  CreateParentLinkComponents(_ecm);
+  data_->CreateJointComponents(_ecm, data_->joint_entity_);
+  data_->CreateLinkComponents(_ecm);
+  data_->CreateParentLinkComponents(_ecm);
 
   std::string topic_name = transport::TopicUtils::AsValidTopic(
-      "/" + data_->model.Name(_ecm) + "/thruster_" +
+      "/" + data_->model_.Name(_ecm) + "/thruster_" +
       std::to_string(data_->thruster_number) + "/thrust");
   data_->node.Subscribe(topic_name, &ThrusterPluginData::OnThrustCmd,
                         data_.get());
@@ -118,21 +183,8 @@ void ThrusterPlugin::PreUpdate(const ignition::gazebo::UpdateInfo &_info,
     return;
   }
 
-  auto pose = data_->link.WorldPose(_ecm);
-  double thrust = data_->Thrust();
-  math::Vector3d force(thrust, 0.0, 0.0);
-  data_->link.AddWorldForce(_ecm, pose->Rot().RotateVector(force));
-
-  auto velocity =
-      _ecm.Component<components::JointVelocityCmd>(data_->joint_entity);
-  if (velocity == nullptr) {
-    CreateJointComponents(_ecm, data_->joint_entity);
-  } else if (!velocity->Data().empty()) {
-    double speed = data_->Speed();
-    velocity->Data()[0] = speed;
-  } else {
-    ignerr << ":-(" << std::endl;
-  }
+  data_->ApplyThrustAndTorque(_ecm);
+  data_->UpdateSpeed(_ecm);
 }
 
 void ThrusterPlugin::ParseSdf(const std::shared_ptr<const sdf::Element> &_sdf,
@@ -155,7 +207,7 @@ void ThrusterPlugin::ParseThrusterParams(
   name = "link";
   if (_element->HasElement(name)) {
     std::string link_name = _element->Get<std::string>(name);
-    data_->link = Link(data_->model.LinkByName(_ecm, link_name));
+    data_->link_ = Link(data_->model_.LinkByName(_ecm, link_name));
   } else {
     SDF_MISSING_ELEMENT(name);
   }
@@ -163,8 +215,8 @@ void ThrusterPlugin::ParseThrusterParams(
   name = "joint";
   if (_element->HasElement(name)) {
     std::string joint_name = _element->Get<std::string>(name);
-    data_->joint_entity = data_->model.JointByName(_ecm, joint_name);
-    if (data_->joint_entity != kNullEntity) {
+    data_->joint_entity_ = data_->model_.JointByName(_ecm, joint_name);
+    if (data_->joint_entity_ != kNullEntity) {
     } else {
       ignerr << "Joint with name [" << joint_name << "] not found!"
              << std::endl;
@@ -214,39 +266,28 @@ void ThrusterPlugin::ParseThrusterParams(
   } else {
     SDF_MISSING_ELEMENT(name);
   }
-}
 
-void ThrusterPlugin::CreateJointComponents(
-    ignition::gazebo::EntityComponentManager &_ecm,
-    ignition::gazebo::Entity _joint) {
-  if (!_ecm.EntityHasComponentType(_joint,
-                                   components::JointVelocity().TypeId())) {
-    _ecm.CreateComponent(data_->joint_entity, components::JointVelocity({0.0}));
+  name = "turning_direction";
+  if (_element->HasElement(name)) {
+    std::string direction = _element->Get<std::string>(name);
+    if (direction == "cw") {
+      data_->turning_direction = turning_direction::CW;
+    } else {
+      data_->turning_direction = turning_direction::CCW;
+    }
+  } else {
+    SDF_MISSING_ELEMENT(name);
   }
 
-  if (!_ecm.EntityHasComponentType(_joint,
-                                   components::JointVelocityCmd().TypeId())) {
-    _ecm.CreateComponent(data_->joint_entity,
-                         components::JointVelocityCmd({0.0}));
-  }
-}
-
-void ThrusterPlugin::CreateLinkComponents(
-    ignition::gazebo::EntityComponentManager &_ecm) {
-  if (!_ecm.Component<components::WorldPose>(data_->link.Entity())) {
-    _ecm.CreateComponent(data_->link.Entity(), components::WorldPose());
-  }
-}
-
-void ThrusterPlugin::CreateParentLinkComponents(
-    ignition::gazebo::EntityComponentManager &_ecm) {
-  if (!_ecm.Component<components::WorldPose>(data_->parent_link.Entity())) {
-    _ecm.CreateComponent(data_->parent_link.Entity(), components::WorldPose());
-  }
-
-  if (!_ecm.Component<components::ExternalWorldWrenchCmd>(
-          data_->parent_link.Entity())) {
-    _ecm.CreateComponent(data_->parent_link.Entity(),
-                         components::ExternalWorldWrenchCmd());
+  name = "propeller_direction";
+  if (_element->HasElement(name)) {
+    std::string direction = _element->Get<std::string>(name);
+    if (direction == "cw") {
+      data_->propeller_direction = turning_direction::CW;
+    } else {
+      data_->propeller_direction = turning_direction::CCW;
+    }
+  } else {
+    SDF_MISSING_ELEMENT(name);
   }
 }
