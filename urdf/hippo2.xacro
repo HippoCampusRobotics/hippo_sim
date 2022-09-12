@@ -3,6 +3,10 @@
     <xacro:include filename="$(find hippo_sim)/urdf/hippo2_params.xacro" />
     <xacro:include filename="$(find hippo_sim)/urdf/thruster_macro.xacro" />
     <xacro:include filename="$(find hippo_sim)/urdf/hippo2_args.xacro" />
+    <xacro:include filename="$(find hippo_sim)/urdf/clamp_macro.xacro" />
+    <xacro:include filename="$(find hippo_sim)/urdf/mount_macro.xacro" />
+
+    <xacro:property name="thruster_xy" value="${thruster_r / 2**0.5}" />
     <gazebo>
         <static>false</static>
     </gazebo>
@@ -33,6 +37,7 @@
         <parent link="base_link" />
         <child link="flange_link" />
     </joint>
+
     <link name="dome_link">
         <inertial>
             <mass value="1e-5" />
@@ -56,6 +61,9 @@
     <gazebo reference="dome_joint">
         <preserveFixedJoint>true</preserveFixedJoint>
     </gazebo>
+
+    <xacro:clamp parent="base_link" suffix="clamp_lower" xyz="0 0 0" rpy="${radians(90)} 0 0" />
+    <xacro:clamp parent="base_link" suffix="clamp_upper" xyz="0 0 0" rpy="${radians(-90)} 0 0" />
 
     <gazebo reference="base_link">
         <sensor name="imu_sensor" type="imu">
@@ -104,6 +112,11 @@
     <xacro:thruster parent="base_link" suffix="starboard_top" xyz="0 -${thruster_r / 2**0.5} ${thruster_r / 2**0.5}" axis="1 0 0" turning_direction="cw" propeller_direction="ccw" color="green" number="1" />
     <xacro:thruster parent="base_link" suffix="starboard_bot" xyz="0 -${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" axis="1 0 0" turning_direction="cw" propeller_direction="cw" color="grey" number="2" />
     <xacro:thruster parent="base_link" suffix="port_bot" xyz="0 ${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" axis="1 0 0" turning_direction="cw" propeller_direction="ccw" color="grey" number="3" />
+
+    <xacro:mount parent="base_link" suffix="port_top" xyz="0 ${thruster_r / 2**0.5} ${thruster_r / 2**0.5}" rpy="${radians(-45)} 0 0" />
+    <xacro:mount parent="base_link" suffix="starboard_top" xyz="0 -${thruster_r / 2**0.5} ${thruster_r / 2**0.5}" rpy="${radians(45)} 0 0" />
+    <xacro:mount parent="base_link" suffix="starboard_bot" xyz="0 -${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" rpy="${radians(135)} 0 0" />
+    <xacro:mount parent="base_link" suffix="port_bot" xyz="0 ${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" rpy="${radians(-135)} 0 0" />
 
     <gazebo>
         <plugin filename="BuoyancyPlugin" name="ignition::gazebo::systems::BuoyancyPlugin">

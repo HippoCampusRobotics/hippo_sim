@@ -4,7 +4,7 @@
     <xacro:property name="ixx" value="0.0024" />
     <xacro:property name="iyy" value="0.010717" />
     <xacro:property name="izz" value="0.010717" />
-    <xacro:property name="thruster_r" value="0.09" />
+    <xacro:property name="thruster_r" value="0.097" />
     <xacro:property name="added_mass_linear" value="1.11 2.8 2.8" />
     <xacro:property name="added_mass_angular" value="0.00451 0.0163 0.0163"/>
     <xacro:property name="damping_linear" value="5.39 17.36 17.36"/>

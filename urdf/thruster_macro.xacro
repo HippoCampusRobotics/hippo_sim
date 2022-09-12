@@ -97,7 +97,7 @@
             </inertial>
             <visual>
                 <geometry>
-                    <mesh filename="$(find hippo_sim)/meshes/propeller.dae" />
+                    <mesh filename="$(find hippo_sim)/meshes/propeller_${propeller_direction}.dae" />
                 </geometry>
             </visual>
         </link>
