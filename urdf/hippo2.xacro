@@ -5,6 +5,7 @@
     <xacro:include filename="$(find hippo_sim)/urdf/thruster/thruster_macro.xacro" />
     <xacro:include filename="$(find hippo_sim)/urdf/clamp_macro.xacro" />
     <xacro:include filename="$(find hippo_sim)/urdf/mount_macro.xacro" />
+    <xacro:include filename="$(find hippo_sim)/urdf/camera/camera_macro.xacro" />
 
     <xacro:property name="thruster_xy" value="${thruster_r / 2**0.5}" />
     <gazebo>
@@ -117,6 +118,8 @@
     <xacro:mount parent="base_link" suffix="starboard_top" xyz="0 -${thruster_r / 2**0.5} ${thruster_r / 2**0.5}" rpy="${radians(45)} 0 0" />
     <xacro:mount parent="base_link" suffix="starboard_bot" xyz="0 -${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" rpy="${radians(135)} 0 0" />
     <xacro:mount parent="base_link" suffix="port_bot" xyz="0 ${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" rpy="${radians(-135)} 0 0" />
+
+    <xacro:camera_macro parent="base_link" prefix="vertical_camera" xyz="${camera_position}" rpy="0 ${radians(90)} 0" />
 
     <gazebo>
         <plugin filename="ignition-gazebo-pose-publisher-system" name="ignition::gazebo::systems::PosePublisher">
