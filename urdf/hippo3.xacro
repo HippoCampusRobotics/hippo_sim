@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="hippocampus">
     <xacro:include filename="$(find hippo_sim)/urdf/common.xacro" />
-    <xacro:include filename="$(find hippo_sim)/urdf/hippo2_params.xacro" />
+    <xacro:include filename="$(find hippo_sim)/urdf/hippo3_params.xacro" />
     <xacro:include filename="$(find hippo_sim)/urdf/thruster/thruster_macro.xacro" />
     <xacro:include filename="$(find hippo_sim)/urdf/clamp_macro.xacro" />
     <xacro:include filename="$(find hippo_sim)/urdf/mount_macro.xacro" />
