@@ -119,6 +119,9 @@
     <xacro:mount parent="base_link" suffix="port_bot" xyz="0 ${thruster_r / 2**0.5} -${thruster_r / 2**0.5}" rpy="${radians(-135)} 0 0" />
 
     <gazebo>
+        <plugin filename="ignition-gazebo-pose-publisher-system" name="ignition::gazebo::systems::PosePublisher">
+    
+        </plugin>
         <plugin filename="BuoyancyPlugin" name="ignition::gazebo::systems::BuoyancyPlugin">
             <buoyancy>
                 <link_name>base_link</link_name>
