@@ -25,17 +25,13 @@ def generate_launch_description():
         default_value=default_vehicle_name,
         description='Vehicle name used as namespace.')
 
-    imu_topic = LaunchConfiguration(
-        'imu_topic', default=['/',
-                              LaunchConfiguration('vehicle_name'), '/imu'])
-
     # PathJoinSubstitution(LaunchConfiguration('model_path'))
     robot_description = LaunchConfiguration(
         'robot_description',
         default=Command([
             'ros2 run hippo_sim create_robot_description.py ', '--input ',
-            LaunchConfiguration('model_path'), ' --mappings imu_topic=',
-            imu_topic
+            LaunchConfiguration('model_path'), ' --mappings vehicle_name=',
+            LaunchConfiguration('vehicle_name')
         ]))
     params = {'robot_description': robot_description}
 

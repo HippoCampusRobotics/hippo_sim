@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="thruster" params="suffix parent xyz axis turning_direction propeller_direction color number">
-        <xacro:include filename="$(find hippo_sim)/urdf/thruster_params.xacro" />
+        <xacro:include filename="$(find hippo_sim)/urdf/thruster/thruster_params.xacro" />
 
         <xacro:property name="mount_link" value="${suffix}_thruster_mount_link" />
         <xacro:property name="mount_joint" value="${suffix}_thruster_mount_joint" />
