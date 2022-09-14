@@ -1,9 +1,11 @@
 from ament_index_python.packages import get_package_share_path
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, GroupAction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, GroupAction, RegisterEventHandler, EmitEvent
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import PushRosNamespace
+from launch.event_handlers import OnProcessExit
+from launch.events import Shutdown
 
 from launch_ros.actions import Node
 
@@ -11,6 +13,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     package_path = get_package_share_path('hippo_sim')
     world = package_path / 'world' / 'empty.sdf'
+    pool_path = package_path / 'urdf/pool.xacro'
     default_model_path = package_path / 'urdf/hippo3.xacro'
     default_vehicle_name = 'uuv00'
 
@@ -30,7 +33,14 @@ def generate_launch_description():
             LaunchConfiguration('model_path'), ' --mappings vehicle_name=',
             LaunchConfiguration('vehicle_name')
         ]))
+    pool_description = LaunchConfiguration(
+        'pool_description',
+        default=Command([
+            'ros2 run hippo_sim create_robot_description.py ', '--input ',
+            str(pool_path)
+        ]))
     params = {'robot_description': robot_description}
+    pool_params = {'pool_description': pool_description}
 
     vehicle_group = GroupAction([
         PushRosNamespace(LaunchConfiguration('vehicle_name')),
@@ -46,5 +56,18 @@ def generate_launch_description():
                                  str(world)],
                             output='screen')
 
-    return LaunchDescription(
-        [model_launch_arg, vehicle_name_launch_arg, vehicle_group, gazebo])
+    return LaunchDescription([
+        model_launch_arg,
+        vehicle_name_launch_arg,
+        vehicle_group,
+        gazebo,
+        Node(package='hippo_sim',
+             executable='spawn',
+             parameters=[pool_params],
+             arguments=['--param', 'pool_description'],
+             output='screen'),
+        RegisterEventHandler(event_handler=OnProcessExit(
+            target_action=gazebo,
+            on_exit=[EmitEvent(event=Shutdown())]
+        ))
+    ])

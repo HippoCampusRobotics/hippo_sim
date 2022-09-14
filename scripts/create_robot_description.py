@@ -6,10 +6,11 @@ import argparse
 
 def parse_mappings(args):
     mapping = {}
-    for arg in args:
-        s = arg.split('=')
-        if len(s) > 1:
-            mapping[s[0]] = s[1]
+    if args:
+        for arg in args:
+            s = arg.split('=')
+            if len(s) > 1:
+                mapping[s[0]] = s[1]
     return mapping
 
 
@@ -17,7 +18,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--mappings',
-        required=True,
         nargs='+',
         help='space separated list of mappings in the form of arg_name=value')
     parser.add_argument('--input', required=True)
