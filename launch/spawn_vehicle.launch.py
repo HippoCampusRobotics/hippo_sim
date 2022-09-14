@@ -1,11 +1,12 @@
 from ament_index_python.packages import get_package_share_path
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, GroupAction, RegisterEventHandler, EmitEvent
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, GroupAction, RegisterEventHandler, EmitEvent, IncludeLaunchDescription
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import PushRosNamespace
 from launch.event_handlers import OnProcessExit
 from launch.events import Shutdown
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch_ros.actions import Node
 
@@ -14,6 +15,7 @@ def generate_launch_description():
     package_path = get_package_share_path('hippo_sim')
     world = package_path / 'world' / 'empty.sdf'
     pool_path = package_path / 'urdf/pool.xacro'
+    apriltags_floor_path = package_path / 'urdf/apriltags_floor/apriltags_floor.xacro'
     default_model_path = package_path / 'urdf/hippo3.xacro'
     default_vehicle_name = 'uuv00'
 
@@ -66,6 +68,9 @@ def generate_launch_description():
              parameters=[pool_params],
              arguments=['--param', 'pool_description'],
              output='screen'),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(str(package_path / 'launch/spawn_apriltag_floor.launch.py'))
+        ),
         RegisterEventHandler(event_handler=OnProcessExit(
             target_action=gazebo,
             on_exit=[EmitEvent(event=Shutdown())]
