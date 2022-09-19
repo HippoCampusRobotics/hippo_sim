@@ -23,13 +23,12 @@ class Bridge {
 
   void CreateGroundTruthBridge() {
     std::string topic_name;
-    rclcpp::SensorDataQoS sensor_qos;
-    sensor_qos.keep_last(100);
+    rclcpp::SystemDefaultsQoS qos;
+    qos.keep_last(100);
 
     // ros publisher
     topic_name = node_topics->resolve_topic_name("ground_truth/pose");
-    pose_pub_ =
-        ros_node_->create_publisher<PoseStamped>(topic_name, sensor_qos);
+    pose_pub_ = ros_node_->create_publisher<PoseStamped>(topic_name, qos);
 
     // gazebo subscriber
     topic_name = "/model" + node_topics->resolve_topic_name("pose");
@@ -40,12 +39,12 @@ class Bridge {
 
   void CreateImuBridge() {
     std::string topic_name;
-    rclcpp::SensorDataQoS sensor_qos;
-    sensor_qos.keep_last(100);
+    rclcpp::SystemDefaultsQoS qos;
+    qos.keep_last(100);
 
     // ros publisher
     topic_name = node_topics->resolve_topic_name("imu");
-    imu_pub_ = ros_node_->create_publisher<Imu>(topic_name, sensor_qos);
+    imu_pub_ = ros_node_->create_publisher<Imu>(topic_name, qos);
 
     // gazebo subscriber
     gz_node_->Subscribe(topic_name, &Bridge::OnImu, this);
@@ -54,7 +53,7 @@ class Bridge {
   void CreateThrusterBridge() {
     for (int i = 0; i < 4; i++) {
       std::string topic_name;
-      rclcpp::SensorDataQoS qos;
+      rclcpp::SystemDefaultsQoS qos;
       qos.keep_last(50);
       topic_name = node_topics->resolve_topic_name("thruster_") +
                    std::to_string(i) + "/thrust";
