@@ -123,7 +123,7 @@
 
     <gazebo>
         <plugin filename="ignition-gazebo-pose-publisher-system" name="ignition::gazebo::systems::PosePublisher">
-    
+            <update_frequency>50.0</update_frequency>
         </plugin>
         <plugin filename="BuoyancyPlugin" name="ignition::gazebo::systems::BuoyancyPlugin">
             <buoyancy>
