@@ -13,7 +13,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     package_path = get_package_share_path('hippo_sim')
-    default_model_path = package_path / 'urdf/hippo3.xacro'
+    default_model_path = package_path / 'urdf/hippo3/hippo3.xacro'
     default_vehicle_name = 'uuv00'
 
     model_launch_arg = DeclareLaunchArgument(
