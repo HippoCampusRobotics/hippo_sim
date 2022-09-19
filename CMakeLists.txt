@@ -57,6 +57,8 @@ install(
 # Install Python executables
 install(PROGRAMS
   scripts/create_robot_description.py
+  scripts/generate_tag_poses.py
+  scripts/generate_pool.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

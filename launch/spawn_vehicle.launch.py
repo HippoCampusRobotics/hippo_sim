@@ -13,9 +13,6 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     package_path = get_package_share_path('hippo_sim')
-    world = package_path / 'world' / 'empty.sdf'
-    pool_path = package_path / 'urdf/pool.xacro'
-    apriltags_floor_path = package_path / 'urdf/apriltags_floor/apriltags_floor.xacro'
     default_model_path = package_path / 'urdf/hippo3.xacro'
     default_vehicle_name = 'uuv00'
 
@@ -35,44 +32,32 @@ def generate_launch_description():
             LaunchConfiguration('model_path'), ' --mappings vehicle_name=',
             LaunchConfiguration('vehicle_name')
         ]))
-    pool_description = LaunchConfiguration(
-        'pool_description',
-        default=Command([
-            'ros2 run hippo_sim create_robot_description.py ', '--input ',
-            str(pool_path)
-        ]))
-    params = {'robot_description': robot_description}
-    pool_params = {'pool_description': pool_description}
+
+    description = {'robot_description': robot_description}
 
     vehicle_group = GroupAction([
         PushRosNamespace(LaunchConfiguration('vehicle_name')),
         Node(package='hippo_sim',
              executable='spawn',
-             parameters=[params],
-             arguments=['--param', 'robot_description'],
+             parameters=[description],
+             arguments=[
+                 '--param',
+                 'robot_description',
+                 '--x',
+                 '1.0',
+                 '--y',
+                 '1.0',
+                 '--z',
+                 '-0.5',
+                 '--Y',
+                 '1.5708',
+             ],
              output='screen'),
         Node(package='hippo_sim', executable='bridge', output='screen'),
     ])
-
-    gazebo = ExecuteProcess(cmd=['ign', 'gazebo', '-v 1',
-                                 str(world)],
-                            output='screen')
 
     return LaunchDescription([
         model_launch_arg,
         vehicle_name_launch_arg,
         vehicle_group,
-        gazebo,
-        Node(package='hippo_sim',
-             executable='spawn',
-             parameters=[pool_params],
-             arguments=['--param', 'pool_description'],
-             output='screen'),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(str(package_path / 'launch/spawn_apriltag_floor.launch.py'))
-        ),
-        RegisterEventHandler(event_handler=OnProcessExit(
-            target_action=gazebo,
-            on_exit=[EmitEvent(event=Shutdown())]
-        ))
     ])
