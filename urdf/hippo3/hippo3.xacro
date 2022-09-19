@@ -145,5 +145,10 @@
             </hydrodynamics>
         </plugin>
 
+        <plugin filename="PosePlugin" name="ignition::gazebo::systems::PosePlugin">
+            <link>base_link</link>
+            <update_rate>50.0</update_rate>
+        </plugin>
+
     </gazebo>
 </robot>

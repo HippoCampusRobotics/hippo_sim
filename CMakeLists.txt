@@ -21,6 +21,7 @@ set(GZ_TRANSPORT_VER ${ignition-transport11_VERSION_MAJOR})
 add_subdirectory(plugins/buoyancy)
 add_subdirectory(plugins/hydrodynamics)
 add_subdirectory(plugins/thruster)
+add_subdirectory(plugins/pose)
 
 add_executable(spawn src/spawn.cpp)
 ament_target_dependencies(spawn
