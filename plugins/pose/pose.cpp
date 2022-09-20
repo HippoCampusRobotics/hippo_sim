@@ -21,64 +21,102 @@ using namespace pose;
 using namespace ignition;
 using namespace gazebo;
 
-class pose::PosePluginData {
+class pose::PosePluginPrivate {
  public:
-  ignition::gazebo::Model model_{kNullEntity};
-  Link link_{kNullEntity};
-  transport::Node node_;
-  std::string link_name_ = "base_link";
-  double update_rate_ = 10.0;
   std::chrono::steady_clock::duration update_period_{0};
   std::chrono::steady_clock::duration last_pub_time_{0};
-  msgs::Pose pose_msg_;
-
-  transport::Node::Publisher pose_pub_;
 
   void ParseSdf(const std::shared_ptr<const sdf::Element> &_sdf,
                 EntityComponentManager &_ecm) {
-    link_name_ = _sdf->Get<std::string>("link", link_name_).first;
-    update_rate_ = _sdf->Get<double>("update_rate", update_rate_).first;
-    if (update_rate_ > 0.0) {
-      std::chrono::duration<double> period{1.0 / update_rate_};
+    sdf_params_.link = _sdf->Get<std::string>("link", sdf_params_.link).first;
+    sdf_params_.base_topic =
+        _sdf->Get<std::string>("base_topic", sdf_params_.base_topic).first;
+    sdf_params_.update_rate =
+        _sdf->Get<double>("update_rate", sdf_params_.update_rate).first;
+    if (sdf_params_.update_rate > 0.0) {
+      std::chrono::duration<double> period{1.0 / sdf_params_.update_rate};
       update_period_ =
           std::chrono::duration_cast<std::chrono::steady_clock::duration>(
               period);
     }
   }
 
-  void InitEntities(EntityComponentManager &_ecm) {
-    link_ = Link(model_.LinkByName(_ecm, link_name_));
-    if (!_ecm.Component<components::WorldPose>(link_.Entity())) {
-      _ecm.CreateComponent(link_.Entity(), components::WorldPose());
+  bool InitModel(EntityComponentManager &_ecm, Entity _entity) {
+    model_ = Model(_entity);
+    if (!model_.Valid(_ecm)) {
+      return false;
     }
+    SetModelName(model_.Name(_ecm));
+    InitEntities(_ecm);
+    InitPoseHeader();
+    return true;
   }
 
   void PublishPose(const EntityComponentManager &_ecm,
                    const msgs::Time &stamp) {
     auto pose = link_.WorldPose(_ecm);
-    pose_msg_.mutable_header()->mutable_stamp()->CopyFrom(stamp);
-    pose_msg_.set_name(link_name_);
+    auto header = pose_msg_.mutable_header();
+    header->mutable_stamp()->CopyFrom(stamp);
     msgs::Set(&pose_msg_, *pose);
     pose_pub_.Publish(pose_msg_);
   }
+
+  void Advertise() { pose_pub_ = node_.Advertise<msgs::Pose>(TopicName()); }
+
+  const std::string TopicName() {
+    return "/" + model_name_ + "/" + sdf_params_.base_topic;
+  }
+
+ private:
+  struct SdfParams {
+    std::string link{"base_link"};
+    double update_rate{10.0};
+    std::string base_topic{"pose"};
+  } sdf_params_;
+
+  void InitPoseHeader() {
+    auto header = pose_msg_.mutable_header();
+    auto frame = header->add_data();
+    frame->set_key("frame_id");
+    frame->add_value("map");
+  }
+
+  void SetModel(Entity _entity) { ; }
+
+  void SetModelName(const std::string _name) { model_name_ = _name; }
+
+  std::string ModelName() { return model_name_; }
+
+  std::string LinkName() { return sdf_params_.link; }
+
+  void InitEntities(EntityComponentManager &_ecm) {
+    link_ = Link(model_.LinkByName(_ecm, sdf_params_.link));
+    if (!_ecm.Component<components::WorldPose>(link_.Entity())) {
+      _ecm.CreateComponent(link_.Entity(), components::WorldPose());
+    }
+  }
+
+  ignition::gazebo::Model model_{kNullEntity};
+  std::string model_name_ = "unknown_model_name";
+  Link link_{kNullEntity};
+  transport::Node node_;
+  transport::Node::Publisher pose_pub_;
+  msgs::Pose pose_msg_;
 };
 
 PosePlugin::PosePlugin()
-    : System(), data_(std::make_unique<PosePluginData>()) {}
+    : System(), private_(std::make_unique<PosePluginPrivate>()) {}
 
 void PosePlugin::Configure(const ignition::gazebo::Entity &_entity,
                            const std::shared_ptr<const sdf::Element> &_sdf,
                            ignition::gazebo::EntityComponentManager &_ecm,
                            ignition::gazebo::EventManager &_eventMgr) {
-  data_->model_ = Model(_entity);
-  if (!data_->model_.Valid(_ecm)) {
+  private_->ParseSdf(_sdf, _ecm);
+  if (!private_->InitModel(_ecm, _entity)) {
     ignerr << "PosePlugin needs to be attached to model entity." << std::endl;
     return;
   }
-  data_->ParseSdf(_sdf, _ecm);
-  data_->InitEntities(_ecm);
-  data_->pose_pub_ = data_->node_.Advertise<msgs::Pose>(
-      "/" + data_->model_.Name(_ecm) + "/pose");
+  private_->Advertise();
 }
 void PosePlugin::PostUpdate(
     const ignition::gazebo::UpdateInfo &_info,
@@ -87,12 +125,12 @@ void PosePlugin::PostUpdate(
     return;
   }
 
-  auto dt = _info.simTime - data_->last_pub_time_;
+  auto dt = _info.simTime - private_->last_pub_time_;
   if ((dt > std::chrono::steady_clock::duration::zero()) &&
-      (dt < data_->update_period_)) {
+      (dt < private_->update_period_)) {
     return;
   }
 
-  data_->last_pub_time_ = _info.simTime;
-  data_->PublishPose(_ecm, convert<msgs::Time>(_info.simTime));
+  private_->last_pub_time_ = _info.simTime;
+  private_->PublishPose(_ecm, convert<msgs::Time>(_info.simTime));
 }

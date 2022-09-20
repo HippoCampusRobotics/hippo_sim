@@ -31,7 +31,6 @@ class Bridge {
     pose_pub_ = ros_node_->create_publisher<PoseStamped>(topic_name, qos);
 
     // gazebo subscriber
-    topic_name = "/model" + node_topics->resolve_topic_name("pose");
     gz_node_->Subscribe(topic_name, &Bridge::OnPose, this);
     RCLCPP_INFO(ros_node_->get_logger(), "Create gz subscription: [%s]",
                 topic_name.c_str());
@@ -79,27 +78,9 @@ class Bridge {
   }
 
   void OnPose(const gz_msgs::Pose &_msg) {
-    std::string frame = "";
-    std::string child_frame = "";
-    for (auto i = 0; i < _msg.header().data_size(); ++i) {
-      auto tmp = _msg.header().data(i);
-      if (tmp.key() == "frame_id" && tmp.value_size() > 0) {
-        frame = tmp.value(0);
-      }
-      if (tmp.key() == "child_frame_id" && tmp.value_size() > 0) {
-        child_frame = tmp.value(0);
-      }
-    }
-    if (frame != "" && child_frame != "") {
-      const std::string delimiter = "::";
-      child_frame.erase(0, child_frame.find("::") + delimiter.length());
-      if (child_frame == "base_link") {
-        geometry_msgs::msg::PoseStamped ros_msg;
-        ros_ign_bridge::convert_ign_to_ros(_msg, ros_msg);
-        ros_msg.header.frame_id = child_frame;
-        pose_pub_->publish(ros_msg);
-      }
-    }
+    geometry_msgs::msg::PoseStamped ros_msg;
+    ros_ign_bridge::convert_ign_to_ros(_msg, ros_msg);
+    pose_pub_->publish(ros_msg);
   }
 
   void OnThrust(const std_msgs::msg::Float64::SharedPtr _msg, int i) {

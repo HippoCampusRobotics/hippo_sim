@@ -148,6 +148,7 @@
         <plugin filename="PosePlugin" name="ignition::gazebo::systems::PosePlugin">
             <link>base_link</link>
             <update_rate>50.0</update_rate>
+            <base_topic>ground_truth/pose</base_topic>
         </plugin>
 
     </gazebo>

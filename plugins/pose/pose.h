@@ -2,7 +2,7 @@
 #include <ignition/gazebo/System.hh>
 
 namespace pose {
-class PosePluginData;
+class PosePluginPrivate;
 class PosePlugin : public ignition::gazebo::System,
                    public ignition::gazebo::ISystemConfigure,
                    public ignition::gazebo::ISystemPostUpdate {
@@ -17,6 +17,6 @@ class PosePlugin : public ignition::gazebo::System,
       const ignition::gazebo::EntityComponentManager &_ecm) override;
 
  private:
-  std::unique_ptr<PosePluginData> data_;
+  std::unique_ptr<PosePluginPrivate> private_;
 };
 }  // namespace pose
