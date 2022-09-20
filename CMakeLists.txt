@@ -51,7 +51,7 @@ install(TARGETS bridge
 )
 
 install(
-  DIRECTORY launch meshes urdf world textures
+  DIRECTORY launch models
   DESTINATION share/${PROJECT_NAME}
 )
 

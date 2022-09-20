@@ -13,8 +13,8 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     package_path = get_package_share_path('hippo_sim')
-    world = package_path / 'world' / 'empty.sdf'
-    pool_path = package_path / 'urdf/pool.xacro'
+    world = package_path / 'models' / 'world' / 'empty.sdf'
+    pool_path = package_path / 'models/pool/urdf/pool.xacro'
 
     pool_description = LaunchConfiguration(
         'pool_description',

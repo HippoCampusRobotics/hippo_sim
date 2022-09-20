@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     package_path = get_package_share_path('hippo_sim')
-    default_urdf_path = package_path / 'urdf/apriltag/apriltag.xacro'
+    default_urdf_path = package_path / 'models/apriltag/urdf/apriltag.xacro'
 
     launch_args = [
         DeclareLaunchArgument(name='urdf_path',

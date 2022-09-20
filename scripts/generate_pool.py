@@ -116,7 +116,7 @@ def main():
         xacro_path = args.input_file
     else:
         package_path = get_package_share_path('hippo_sim')
-        xacro_path = package_path / 'urdf/apriltag/apriltag.xacro'
+        xacro_path = package_path / 'models/apriltag/urdf/apriltag.xacro'
 
     tag_poses = yaml.safe_load(args.tag_poses)
 
