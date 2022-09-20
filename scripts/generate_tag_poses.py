@@ -23,7 +23,7 @@ def generate_even_grid(size: Tuple[int, int], offset: Tuple[float, float,
             y = row * distance_between_tags[1] + offset[1]
             z = offset[2]
             data['tag_poses'].append({
-                'frame_id': 'world',
+                'frame_id': 'map',
                 'id': tag_id,
                 'size': tag_size,
                 'x': x,
