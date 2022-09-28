@@ -7,6 +7,7 @@ using namespace geometry_msgs::msg;
 using namespace sensor_msgs::msg;
 using namespace std_msgs::msg;
 using namespace ignition;
+using namespace nav_msgs::msg;
 namespace gz_msgs = ignition::msgs;
 
 class Bridge {
@@ -34,6 +35,10 @@ class Bridge {
     gz_node_->Subscribe(topic_name, &Bridge::OnPose, this);
     RCLCPP_INFO(ros_node_->get_logger(), "Create gz subscription: [%s]",
                 topic_name.c_str());
+
+    topic_name = node_topics->resolve_topic_name("ground_truth/odometry");
+    odometry_pub_ = ros_node_->create_publisher<Odometry>(topic_name, qos);
+    gz_node_->Subscribe(topic_name, &Bridge::OnOdometry, this);
   }
 
   void CreateImuBridge() {
@@ -83,6 +88,12 @@ class Bridge {
     pose_pub_->publish(ros_msg);
   }
 
+  void OnOdometry(const gz_msgs::Odometry &_msg) {
+    Odometry ros_msg;
+    ros_ign_bridge::convert_ign_to_ros(_msg, ros_msg);
+    odometry_pub_->publish(ros_msg);
+  }
+
   void OnThrust(const std_msgs::msg::Float64::SharedPtr _msg, int i) {
     gz_msgs::Double gz_msg;
     ros_ign_bridge::convert_ros_to_ign(*_msg, gz_msg);
@@ -102,6 +113,7 @@ class Bridge {
 
   rclcpp::Publisher<Imu>::SharedPtr imu_pub_;
   rclcpp::Publisher<PoseStamped>::SharedPtr pose_pub_;
+  rclcpp::Publisher<Odometry>::SharedPtr odometry_pub_;
   std::map<int, transport::Node::Publisher> thrust_pubs_;
   std::map<int, rclcpp::Subscription<Float64>::SharedPtr> thrust_subs_;
 };
