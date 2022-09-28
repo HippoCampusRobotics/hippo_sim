@@ -151,5 +151,11 @@
             <base_topic>ground_truth/pose</base_topic>
         </plugin>
 
+        <plugin filename="OdometryPlugin" name="ignition::gazebo::systems::OdometryPlugin">
+            <link>base_link</link>
+            <update_rate>50.0</update_rate>
+            <base_topic>ground_truth/odometry</base_topic>
+        </plugin>
+
     </gazebo>
 </robot>

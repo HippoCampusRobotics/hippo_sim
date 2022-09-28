@@ -22,6 +22,7 @@ add_subdirectory(plugins/buoyancy)
 add_subdirectory(plugins/hydrodynamics)
 add_subdirectory(plugins/thruster)
 add_subdirectory(plugins/pose)
+add_subdirectory(plugins/odometry)
 
 add_executable(spawn src/spawn.cpp)
 ament_target_dependencies(spawn
