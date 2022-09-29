@@ -57,6 +57,13 @@ install(TARGETS bridge
   DESTINATION lib/${PROJECT_NAME}
 )
 
+set(exec_name fake_state_estimator)
+add_executable(${exec_name} src/fake_state_estimator.cpp)
+ament_target_dependencies(${exec_name} rclcpp nav_msgs)
+install (TARGETS ${exec_name}
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 install(
   DIRECTORY launch models
   DESTINATION share/${PROJECT_NAME}
