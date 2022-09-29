@@ -1,4 +1,4 @@
-#include "odometry.h"
+#include "odometry.hpp"
 
 #include <ignition/msgs/odometry.pb.h>
 #include <ignition/msgs/pose.pb.h>

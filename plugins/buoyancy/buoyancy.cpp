@@ -1,5 +1,5 @@
 // https://github.com/gazebosim/gz-sim/tree/ign-gazebo6/examples/plugin/system_plugin
-#include "buoyancy.h"
+#include "buoyancy.hpp"
 
 #include <ignition/gazebo/Util.hh>
 #include <ignition/gazebo/components/Inertial.hh>

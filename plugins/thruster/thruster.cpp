@@ -1,4 +1,4 @@
-#include "thruster.h"
+#include "thruster.hpp"
 
 #include <ignition/msgs/double.pb.h>
 

@@ -1,4 +1,4 @@
-#include "hydrodynamics.h"
+#include "hydrodynamics.hpp"
 
 #include <ignition/gazebo/components/AngularVelocity.hh>
 #include <ignition/gazebo/components/LinearVelocity.hh>

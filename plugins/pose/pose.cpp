@@ -1,4 +1,4 @@
-#include "pose.h"
+#include "pose.hpp"
 
 #include <ignition/msgs/pose.pb.h>
 
