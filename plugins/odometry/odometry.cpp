@@ -60,11 +60,12 @@ class OdometryPluginPrivate {
     auto pose = link_.WorldPose(_ecm);
     auto v_linear = link_.WorldLinearVelocity(_ecm);
     auto v_angular = link_.WorldAngularVelocity(_ecm);
+    auto v_angular_local = pose->Rot().Inverse().RotateVector(*v_angular);
     auto header = odometry_msg_.mutable_header();
     auto twist = odometry_msg_.mutable_twist();
     header->mutable_stamp()->CopyFrom(stamp);
     msgs::Set(odometry_msg_.mutable_pose(), *pose);
-    msgs::Set(twist->mutable_angular(), *v_angular);
+    msgs::Set(twist->mutable_angular(), v_angular_local);
     msgs::Set(twist->mutable_linear(), *v_linear);
     odometry_pub_.Publish(odometry_msg_);
   }
