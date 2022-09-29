@@ -8,6 +8,7 @@ find_package(gflags REQUIRED)
 find_package(ros_ign_bridge REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(hippo_msgs REQUIRED)
 
 find_package(ignition-plugin1 REQUIRED COMPONENTS register)
 set(GZ_PLUGIN_VER ${ignition-plugin1_VERSION_MAJOR})
@@ -49,6 +50,7 @@ ament_target_dependencies(bridge
   ignition-transport${GZ_TRANSPORT_VER}
   geometry_msgs
   nav_msgs
+  hippo_msgs
 )
 
 install(TARGETS bridge

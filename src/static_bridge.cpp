@@ -1,3 +1,4 @@
+#include <hippo_msgs/msg/actuator_controls.hpp>
 #include <ignition/transport/Node.hh>
 #include <rclcpp/node_interfaces/node_topics.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -6,9 +7,11 @@
 using namespace geometry_msgs::msg;
 using namespace sensor_msgs::msg;
 using namespace std_msgs::msg;
+using namespace hippo_msgs::msg;
 using namespace ignition;
 using namespace nav_msgs::msg;
 namespace gz_msgs = ignition::msgs;
+using std::placeholders::_1;
 
 class Bridge {
  public:
@@ -55,7 +58,7 @@ class Bridge {
   }
 
   void CreateThrusterBridge() {
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < ActuatorControls().control.size(); i++) {
       std::string topic_name;
       rclcpp::SystemDefaultsQoS qos;
       qos.keep_last(50);
@@ -64,16 +67,12 @@ class Bridge {
 
       // gazebo publisher
       thrust_pubs_[i] = gz_node_->Advertise<gz_msgs::Double>(topic_name);
-
-      // ros subscriber
-      std::function<void(const Float64::SharedPtr _msg)> fn =
-          std::bind(&Bridge::OnThrust, this, std::placeholders::_1, i);
-      thrust_subs_[i] =
-          ros_node_->create_subscription<Float64>(topic_name, qos, fn);
-
-      RCLCPP_INFO(ros_node_->get_logger(), "Create subscription: [%s]",
-                  topic_name.c_str());
     }
+
+    rclcpp::SystemDefaultsQoS qos;
+    thrust_sub_ = ros_node_->create_subscription<ActuatorControls>(
+        "thruster_command", qos,
+        std::bind(&Bridge::OnThrusterCommand, this, _1));
   }
 
   void OnImu(const gz_msgs::IMU &_msg) {
@@ -94,15 +93,21 @@ class Bridge {
     odometry_pub_->publish(ros_msg);
   }
 
-  void OnThrust(const std_msgs::msg::Float64::SharedPtr _msg, int i) {
-    gz_msgs::Double gz_msg;
-    ros_ign_bridge::convert_ros_to_ign(*_msg, gz_msg);
-    thrust_pubs_[i].Publish(gz_msg);
+  void OnThrusterCommand(const ActuatorControls::SharedPtr _msg) {
+    if (!(_msg->control.size() == thrust_pubs_.size())) {
+      RCLCPP_ERROR(ros_node_->get_logger(),
+                   "ActuatControls and publisher map do not have same size!");
+      return;
+    }
+    for (int i = 0; i < thrust_pubs_.size(); ++i) {
+      gz_msgs::Double gz_msg;
+      gz_msg.set_data(_msg->control[i]);
+      thrust_pubs_[i].Publish(gz_msg);
+    }
   }
 
   void Run() {
     rclcpp::spin(ros_node_);
-    ignition::transport::waitForShutdown();
   }
 
  private:
@@ -115,7 +120,7 @@ class Bridge {
   rclcpp::Publisher<PoseStamped>::SharedPtr pose_pub_;
   rclcpp::Publisher<Odometry>::SharedPtr odometry_pub_;
   std::map<int, transport::Node::Publisher> thrust_pubs_;
-  std::map<int, rclcpp::Subscription<Float64>::SharedPtr> thrust_subs_;
+  rclcpp::Subscription<ActuatorControls>::SharedPtr thrust_sub_;
 };
 
 int main(int _argc, char **_argv) {
