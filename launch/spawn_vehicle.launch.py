@@ -25,7 +25,7 @@ def generate_launch_description():
         default_value=default_vehicle_name,
         description='Vehicle name used as namespace.')
     fake_estimator_launch_arg = DeclareLaunchArgument(
-        name='fake_state_estimation', default_value='false')
+        name='fake_state_estimation', default_value='true')
     fake_vision_launch_arg = DeclareLaunchArgument(name='fake_vision',
                                                    default_value='false')
 
