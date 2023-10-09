@@ -4,9 +4,12 @@ from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch import LaunchDescription
+from hippo_common.launch_helper import declare_vehicle_name
+from hippo_common.launch_helper import PassLaunchArguments
 
 
 def declare_args(launch_description: LaunchDescription):
+    declare_vehicle_name(launch_description=launch_description)
     action = DeclareLaunchArgument(
         'spawn_apriltags',
         default_value='false',
@@ -44,11 +47,10 @@ def generate_launch_description():
     ############################################################################
     path = str(package_path / 'launch/spawn_hippocampus.launch.py')
     source = PythonLaunchDescriptionSource(path)
-    action = IncludeLaunchDescription(source,
-                                      launch_arguments={
-                                          'vehicle_name': 'uuv00',
-                                          'use_sim_time': 'true'
-                                      }.items())
+    args = PassLaunchArguments()
+    args.add_vehicle_name()
+    args['use_sim_time'] = 'True'
+    action = IncludeLaunchDescription(source, launch_arguments=args.items())
     launch_description.add_action(action)
 
     return launch_description
