@@ -10,7 +10,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
 
-def declare_args(launch_description: LaunchDescription):
+def declare_args(launch_description: LaunchDescription) -> None:
     declare_vehicle_name(launch_description=launch_description)
     action = DeclareLaunchArgument(
         'spawn_apriltags',
@@ -56,4 +56,3 @@ def generate_launch_description() -> LaunchDescription:
     launch_description.add_action(action)
 
     return launch_description
-
