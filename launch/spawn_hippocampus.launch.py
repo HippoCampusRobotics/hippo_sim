@@ -1,19 +1,19 @@
 from ament_index_python.packages import get_package_share_path
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
-from launch.substitutions import LaunchConfiguration
 from hippo_common import launch_helper
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 
 
-def declare_args(launch_description: LaunchDescription):
+def declare_args(launch_description: LaunchDescription) -> None:
     action = DeclareLaunchArgument('vehicle_name')
     launch_description.add_action(action)
     action = DeclareLaunchArgument('use_sim_time')
     launch_description.add_action(action)
 
 
-def generate_launch_description():
+def generate_launch_description() -> LaunchDescription:
     launch_description = LaunchDescription()
     package_path = get_package_share_path('hippo_sim')
 
@@ -35,7 +35,7 @@ def generate_launch_description():
     source = PythonLaunchDescriptionSource(path)
     path = str(package_path / 'models/hippo3/urdf/hippo3.xacro')
     action = IncludeLaunchDescription(
-        source, launch_arguments=dict(model_path=path).items())
+        source, launch_arguments={'model_path': path}.items())
     launch_description.add_action(action)
 
     return launch_description
