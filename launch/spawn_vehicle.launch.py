@@ -1,15 +1,17 @@
 from ament_index_python.packages import get_package_share_path
-import launch
-import launch_ros
-from launch.substitutions import LaunchConfiguration, Command
-from launch.actions import (DeclareLaunchArgument, GroupAction,
-                            IncludeLaunchDescription)
-from launch_ros.actions import Node, PushRosNamespace
+from launch import LaunchDescription
+from launch.actions import (
+    DeclareLaunchArgument,
+    GroupAction,
+    IncludeLaunchDescription,
+)
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import Command, LaunchConfiguration
+from launch_ros.actions import Node, PushRosNamespace
 
 
-def generate_launch_description():
+def generate_launch_description() -> LaunchDescription:
     package_path = get_package_share_path('hippo_sim')
     default_model_path = package_path / 'models/hippo3/urdf/hippo3.xacro'
     default_vehicle_name = 'uuv00'
@@ -32,9 +34,15 @@ def generate_launch_description():
     robot_description = LaunchConfiguration(
         'robot_description',
         default=Command([
-            'ros2 run hippo_sim create_robot_description.py ', '--input ',
-            LaunchConfiguration('model_path'), ' --mappings vehicle_name=',
-            LaunchConfiguration('vehicle_name')
+            'ros2 run hippo_sim create_robot_description.py ',
+            '--input ',
+            LaunchConfiguration('model_path'),
+            ' --mappings vehicle_name=',
+            LaunchConfiguration('vehicle_name'),
+            ' use_vertical_camera=',
+            LaunchConfiguration('use_vertical_camera', default=False),
+            ' use_front_camera=',
+            LaunchConfiguration('use_front_camera', default=False),
         ]))
 
     description = {'robot_description': robot_description}
@@ -62,7 +70,7 @@ def generate_launch_description():
         Node(package='hippo_sim',
              executable='bridge',
              parameters=[{
-                 'use_sim_time': use_sim_time
+                 'use_sim_time': use_sim_time,
              }],
              output='screen'),
         Node(package='hippo_sim',
@@ -77,8 +85,8 @@ def generate_launch_description():
              condition=IfCondition(LaunchConfiguration(
                  'fake_state_estimation'))),
         Node(package='hippo_sim',
-             executable="fake_vision",
-             name="vision",
+             executable='fake_vision',
+             name='vision',
              parameters=[
                  {
                      'use_sim_time': use_sim_time,
@@ -109,7 +117,7 @@ def generate_launch_description():
         }.items(),
     )
 
-    return launch.LaunchDescription([
+    return LaunchDescription([
         model_launch_arg,
         vehicle_name_launch_arg,
         fake_estimator_launch_arg,

@@ -11,6 +11,8 @@ def declare_args(launch_description: LaunchDescription) -> None:
     launch_description.add_action(action)
     action = DeclareLaunchArgument('use_sim_time')
     launch_description.add_action(action)
+    action = DeclareLaunchArgument('use_vertical_camera', default_value='False')
+    launch_description.add_action(action)
 
 
 def generate_launch_description() -> LaunchDescription:
@@ -25,6 +27,7 @@ def generate_launch_description() -> LaunchDescription:
     action = launch_helper.create_camera_bridge(
         vehicle_name=LaunchConfiguration('vehicle_name'),
         camera_name='vertical_camera',
+        use_camera=LaunchConfiguration('use_vertical_camera'),
         image_name='image_rect')
     launch_description.add_action(action)
 
