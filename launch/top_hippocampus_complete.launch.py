@@ -1,14 +1,16 @@
 from ament_index_python.packages import get_package_share_path
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
-from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration
+from hippo_common.launch_helper import (
+    PassLaunchArguments,
+    declare_vehicle_name,
+)
 from launch import LaunchDescription
-from hippo_common.launch_helper import declare_vehicle_name
-from hippo_common.launch_helper import PassLaunchArguments
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 
 
-def declare_args(launch_description: LaunchDescription):
+def declare_args(launch_description: LaunchDescription) -> None:
     declare_vehicle_name(launch_description=launch_description)
     action = DeclareLaunchArgument(
         'spawn_apriltags',
@@ -19,7 +21,7 @@ def declare_args(launch_description: LaunchDescription):
     launch_description.add_action(action)
 
 
-def generate_launch_description():
+def generate_launch_description() -> LaunchDescription:
     launch_description = LaunchDescription()
     package_path = get_package_share_path('hippo_sim')
 
@@ -28,7 +30,7 @@ def generate_launch_description():
     ############################################################################
     # GAZEBO
     ############################################################################
-    path = str(package_path / 'launch/start_gazebo.launch.py'),
+    path = str(package_path / 'launch/start_gazebo.launch.py')
     source = PythonLaunchDescriptionSource(path)
     action = IncludeLaunchDescription(source)
     launch_description.add_action(action)
