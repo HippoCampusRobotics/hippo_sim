@@ -1,6 +1,6 @@
 from ament_index_python.packages import get_package_share_path
 from hippo_common.launch_helper import (
-    PassLaunchArguments,
+    LaunchArgsDict,
     declare_vehicle_name,
 )
 from launch import LaunchDescription
@@ -49,7 +49,7 @@ def generate_launch_description() -> LaunchDescription:
     ############################################################################
     path = str(package_path / 'launch/spawn_hippocampus.launch.py')
     source = PythonLaunchDescriptionSource(path)
-    args = PassLaunchArguments()
+    args = LaunchArgsDict()
     args.add_vehicle_name()
     args['use_sim_time'] = 'True'
     action = IncludeLaunchDescription(source, launch_arguments=args.items())
