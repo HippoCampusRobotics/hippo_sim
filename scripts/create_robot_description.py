@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-import xacro
-import sys
 import argparse
+import sys
+
+import xacro
 
 
 def parse_mappings(args):
@@ -28,5 +29,5 @@ def main():
     return 0
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

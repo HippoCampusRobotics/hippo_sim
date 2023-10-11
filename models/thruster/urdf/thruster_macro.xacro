@@ -26,7 +26,7 @@
             <gazebo reference="${mount_link}">
                 <visual>
                     <material>
-    
+
                         <ambient>1 1 1 1</ambient>
                         <diffuse>1 1 1 1</diffuse>
                         <specular>1 1 1 1</specular>
@@ -51,7 +51,7 @@
                 <disableFixedJointLumping>true</disableFixedJointLumping>
                 <preserveFixedJoint>true</preserveFixedJoint>
             </gazebo>
-    
+
             <link name="${hull_link}">
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <inertial>
@@ -67,7 +67,7 @@
             <gazebo reference="${hull_link}">
                 <visual>
                     <material>
-    
+
                         <ambient>1 1 1 1</ambient>
                         <diffuse>1 1 1 1</diffuse>
                         <specular>1 1 1 1</specular>

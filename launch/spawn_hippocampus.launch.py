@@ -37,8 +37,9 @@ def generate_launch_description() -> LaunchDescription:
     path = str(package_path / 'launch/spawn_vehicle.launch.py')
     source = PythonLaunchDescriptionSource(path)
     path = str(package_path / 'models/hippo3/urdf/hippo3.xacro')
-    action = IncludeLaunchDescription(
-        source, launch_arguments={'model_path': path}.items())
+    action = IncludeLaunchDescription(source,
+                                      launch_arguments={'model_path':
+                                                        path}.items())
     launch_description.add_action(action)
 
     return launch_description

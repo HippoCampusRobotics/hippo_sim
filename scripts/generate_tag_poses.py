@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-import yaml
+import argparse
 import os
 import sys
-import argparse
 from typing import Tuple
+
+import yaml
 
 
 def float_representer(dumper, value):
-    text = '{0:.3f}'.format(value)
-    return dumper.represent_scalar(u'tag:yaml.org,2002:float', text)
+    text = f'{value:.3f}'
+    return dumper.represent_scalar('tag:yaml.org,2002:float', text)
 
 
 def generate_even_grid(size: Tuple[int, int], offset: Tuple[float, float,
@@ -45,7 +46,7 @@ def generate_standalone_tags(n_tags: int, size: float):
     for i in range(n_tags):
         tag_name = f'tag_{i}'
         data['standalone_tags']['tag_names'].append(tag_name)
-        data['standalone_tags'][tag_name] = dict(id=i, size=size)
+        data['standalone_tags'][tag_name] = {'id': i, 'size': size}
     return data
 
 
@@ -53,18 +54,17 @@ def generate_tag_bundle(tag_poses, name: str):
     layout = {'ids': []}
     for tag in tag_poses['tag_poses']:
         layout['ids'].append(tag['id'])
-        layout[tag["id"]] = dict(
-            size=tag['size'],
-            x=tag['x'],
-            y=tag['y'],
-            z=tag['z'],
-            qw=tag['qw'],
-            qx=tag['qx'],
-            qy=tag['qy'],
-            qz=tag['qz'],
-        )
-    data = {f'{name}': dict(layout=layout)}
-    return data
+        layout[tag['id']] = {
+            'size': tag['size'],
+            'x': tag['x'],
+            'y': tag['y'],
+            'z': tag['z'],
+            'qw': tag['qw'],
+            'qx': tag['qx'],
+            'qy': tag['qy'],
+            'qz': tag['qz'],
+        }
+    return {f'{name}': {'layout': layout}}
 
 
 def convert_to_rosparam(data):

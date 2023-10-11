@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-import xacro
-import xml.etree.ElementTree as ET
-import sys
-import os
-import yaml
 import argparse
-from ament_index_python.packages import get_package_share_path
-import subprocess
-import shlex
-import hashlib
 import glob
+import hashlib
 import math
+import os
+import shlex
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+
+import xacro
+import yaml
+from ament_index_python.packages import get_package_share_path
 
 
 def create_base_model():
@@ -30,7 +31,9 @@ def offset_pose(x, y, z, R, P, Y, model):
         pose.text = f'{x} {y} {z} {R} {P} {Y}'
     else:
         tmp = pose.text.split(' ')
-        pose.text = f'{x+tmp[0]} {y+tmp[1]} {z+tmp[2]} {R+tmp[3]} {P+tmp[4]} {Y+tmp[5]}'
+        pos = f'{x+tmp[0]} {y+tmp[1]} {z+tmp[2]} '
+        rot = f'{R+tmp[3]} {P+tmp[4]} {Y+tmp[5]}'
+        pose.text = pos + rot
     return model
 
 
@@ -45,8 +48,8 @@ def clean_model(model):
 
 def generate_hashes(paths):
     hashes = []
-    n = len(paths)
-    for i, path in enumerate(paths):
+    len(paths)
+    for _i, path in enumerate(paths):
         with open(path, 'rb') as f:
             file_hash = hashlib.blake2b()
             while chunk := f.read(8192):
@@ -62,7 +65,7 @@ def generate_urdfs(xacro_path, tag_poses, output_dir):
         mappings = {
             'size_x': str(tag_data['size'] * 10.0 / 8.0),
             'size_y': str(tag_data['size'] * 10.0 / 8.0),
-            'tag_id': str(tag_data['id'])
+            'tag_id': str(tag_data['id']),
         }
         doc = xacro.process_file(xacro_path, mappings=mappings)
         urdf = doc.toxml()
@@ -81,7 +84,7 @@ def generate_urdfs(xacro_path, tag_poses, output_dir):
 def urdf_changed(old_urdf, new_urdf):
     if len(old_urdf) != len(new_urdf):
         return True
-    for i, urdf in enumerate(new_urdf):
+    for i, _urdf in enumerate(new_urdf):
         if old_urdf[i]['hash'] != new_urdf[i]['hash']:
             return True
     return False
@@ -134,11 +137,11 @@ def main():
         package_path = get_package_share_path('hippo_sim')
         xacro_path = package_path / 'models/apriltag/urdf/apriltag.xacro'
     try:
-        with open(args.tag_poses_file, 'r') as f:
+        with open(args.tag_poses_file) as f:
             tag_poses = yaml.safe_load(f)
     except FileNotFoundError as e:
         print(f'Could not open file {args.tag_poses_file}: {e}')
-        exit(1)
+        sys.exit(1)
 
     if not os.path.exists(cache_dir):
         os.mkdir(cache_dir)
@@ -147,17 +150,16 @@ def main():
     files = glob.glob(p)
     old_urdf = get_old_urdf(p)
     if files:
-        subprocess.Popen(['rm'] + files).wait()
+        subprocess.Popen(['rm', *files]).wait()
 
     base_sdf, base_model = create_base_model()
     urdf = generate_urdfs(xacro_path=xacro_path,
                           tag_poses=tag_poses,
                           output_dir=cache_dir)
-    if not args.force:
-        if not need_to_rebuild(old_urdf, urdf, cache_sdf):
-            with open(cache_sdf, 'r') as f:
-                sys.stdout.write(f.read())
-            return
+    if not args.force and not need_to_rebuild(old_urdf, urdf, cache_sdf):
+        with open(cache_sdf) as f:
+            sys.stdout.write(f.read())
+        return
     cmds = [shlex.split(f'ign sdf -p {x["path"]}') for x in urdf]
     p = [
         subprocess.Popen(x, stdout=subprocess.PIPE, universal_newlines=True)

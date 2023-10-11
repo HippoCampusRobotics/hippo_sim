@@ -1,19 +1,19 @@
 from ament_index_python.packages import get_package_share_path
-from launch.actions import DeclareLaunchArgument
-from launch_ros.actions import Node
-from launch.substitutions import LaunchConfiguration, Command
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import Command, LaunchConfiguration
+from launch_ros.actions import Node
 
 
 def add_generate_pool_node(launch_description: LaunchDescription):
     args = [
-        ' --tag-poses-file \'',
+        " --tag-poses-file '",
         LaunchConfiguration('tag_poses_file'),
-        '\'',
+        "'",
         ' --force',
     ]
     cmd = 'ros2 run hippo_sim generate_pool.py'
-    sdf = LaunchConfiguration('sdf', default=Command([cmd] + args))
+    sdf = LaunchConfiguration('sdf', default=Command([cmd, *args]))
     params = {'description': sdf}
     action = Node(package='hippo_sim',
                   executable='spawn',
