@@ -107,7 +107,13 @@
                 <plugin filename="range_sensor" name="hippo_gz_plugins::range_sensor">
                     <link>base_link</link>
                     <range_topic>range_topic</range_topic>
-                    <update_rate>20.0</update_rate>
+                    <update_rate>10.0</update_rate>
+                    <range_noise_stddev>0.02</range_noise_stddev>
+                    <fov_angle>${radians(90.0)}</fov_angle>
+                    <max_viewing_angle>${radians(140.0)}</max_viewing_angle>
+                    <drop_probability>0.05</drop_probability>
+                    <max_detection_distance>5.0</max_detection_distance>
+                    <drop_probability_exp>2.0</drop_probability_exp>
                     <model name="range_tag_00">
                         <link>base_link</link>
                         <id>0</id>
