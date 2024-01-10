@@ -38,7 +38,7 @@
             <xacro:bluerov_thrusters parent_link="${link_ns}/${base_link_name}" />
 
             <xacro:if value="$(arg use_vertical_camera)">
-                <xacro:camera_macro parent="base_link"
+                <xacro:camera_macro parent="${link_ns}/${base_link_name}"
                     prefix="vertical_camera" xyz="${vertical_camera_position}"
                     rpy="${vertical_camera_orientation}" />
             </xacro:if>
