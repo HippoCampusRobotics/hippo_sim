@@ -1,14 +1,17 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="hippocampus">
-    <xacro:macro name="bluerov" params="base_link_name:=base_link link_ns use_uvms_param:=False rviz_model:=False simulate_kinematics:=False">
+    <xacro:macro name="bluerov"
+        params="base_link_name:=base_link link_ns use_uvms_param:=False rviz_model:=False simulate_kinematics:=False">
         <xacro:if value="${use_uvms_param == True}">
-            <xacro:include filename="$(find hippo_sim)/models/bluerov/urdf/bluerov_params_uvms.xacro" />
+            <xacro:include
+                filename="$(find hippo_sim)/models/bluerov/urdf/bluerov_params_uvms.xacro" />
         </xacro:if>
         <xacro:unless value="${use_uvms_param == True}">
             <xacro:include filename="$(find hippo_sim)/models/bluerov/urdf/bluerov_params.xacro" />
         </xacro:unless>
         <xacro:include filename="$(find hippo_sim)/models/bluerov/urdf/bluerov_thrusters.xacro" />
-        <!-- <xacro:include filename="$(find hippo_sim)/models/range_sensor/urdf/range_sensor_macro.xacro" /> -->
+        <!-- <xacro:include filename="$(find
+        hippo_sim)/models/range_sensor/urdf/range_sensor_macro.xacro" /> -->
         <xacro:include filename="$(find hippo_sim)/models/camera/urdf/camera_macro.xacro" />
 
         <xacro:property name="thruster_xy" value="${thruster_r / 2**0.5}" />
@@ -19,10 +22,10 @@
 
         <link name="${link_ns}/${base_link_name}">
             <xacro:unless value="${rviz_model == True}">
-            <inertial name="base_link_inertial">
-                <mass value="${base_mass}" />
-                <inertia ixx="${ixx}" ixy="0.0" ixz="0.0" iyy="${iyy}" iyz="0.0" izz="${izz}" />
-            </inertial>
+                <inertial name="base_link_inertial">
+                    <mass value="${base_mass}" />
+                    <inertia ixx="${ixx}" ixy="0.0" ixz="0.0" iyy="${iyy}" iyz="0.0" izz="${izz}" />
+                </inertial>
             </xacro:unless>
             <visual name="base_link_visual">
                 <geometry>
@@ -32,7 +35,7 @@
         </link>
 
         <xacro:unless value="${rviz_model == True}">
-            <xacro:bluerov_thrusters parent_link="${link_ns}/${base_link_name}"/>
+            <xacro:bluerov_thrusters parent_link="${link_ns}/${base_link_name}" />
 
             <xacro:if value="$(arg use_vertical_camera)">
                 <xacro:camera_macro parent="base_link"
@@ -55,7 +58,8 @@
                     <link_name>${link_ns}/${base_link_name}</link_name>
                 </plugin>
                 <!--
-                <plugin name="ignition::gazebo::systems::VelocityControl" filename="ignition-gazebo-velocity-control-system">
+                <plugin name="ignition::gazebo::systems::VelocityControl"
+                filename="ignition-gazebo-velocity-control-system">
                     <link_name>${link_ns}/${base_link_name}</link_name>
                 </plugin>
                 -->
@@ -105,7 +109,7 @@
 
             <xacro:if value="$(arg use_range_sensor)">
                 <plugin filename="range_sensor" name="hippo_gz_plugins::range_sensor">
-                    <link>base_link</link>
+                    <link>${link_ns}/${base_link_name}</link>
                     <range_topic>range_topic</range_topic>
                     <update_rate>10.0</update_rate>
                     <range_noise_stddev>0.02</range_noise_stddev>
