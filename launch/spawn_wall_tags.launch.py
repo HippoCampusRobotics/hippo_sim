@@ -10,7 +10,7 @@ def generate_launch_description() -> LaunchDescription:
     hippo_sim_path = get_package_share_path('hippo_sim')
     apriltag_path = str(hippo_sim_path / 'models/apriltag/urdf/apriltag.xacro')
 
-    tmp = math.pi / 2.0
+    tmp = -math.pi / 2.0
     poses = [
         {
             'xyz': (0.7, 3.8, -0.5),

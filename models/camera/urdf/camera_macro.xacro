@@ -36,6 +36,11 @@
             </visual>
             <sensor name="$(arg vehicle_name)_${prefix}" type="camera">
                 <camera>
+                    <noise>
+                        <type>gaussian</type>
+                        <mean>0</mean>
+                        <stddev>0.1</stddev>
+                    </noise>
                     <camera_info_topic>$(arg vehicle_name)/${prefix}/camera_info</camera_info_topic>
                     <horizontal_fov>${horizontal_fov}</horizontal_fov>
                     <image>
