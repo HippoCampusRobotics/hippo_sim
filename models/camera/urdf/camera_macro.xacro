@@ -21,7 +21,7 @@
             <parent link="${parent}" />
             <child link="${link}" />
         </joint>
-        <gazebo reference="${link}">
+        <gazebo reference="${joint}">
             <disableFixedJointLumping>true</disableFixedJointLumping>
             <preserveFixedJoint>true</preserveFixedJoint>
         </gazebo>
