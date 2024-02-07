@@ -13,6 +13,8 @@ def declare_args(launch_description: LaunchDescription) -> None:
     launch_description.add_action(action)
     action = DeclareLaunchArgument('use_vertical_camera', default_value='False')
     launch_description.add_action(action)
+    action = DeclareLaunchArgument('use_acoustic_modem', default_value='False')
+    launch_description.add_action(action)
 
 
 def generate_launch_description() -> LaunchDescription:
@@ -37,9 +39,11 @@ def generate_launch_description() -> LaunchDescription:
     path = str(package_path / 'launch/spawn_vehicle.launch.py')
     source = PythonLaunchDescriptionSource(path)
     path = str(package_path / 'models/hippo3/urdf/hippo3.xacro')
-    action = IncludeLaunchDescription(source,
-                                      launch_arguments={'model_path':
-                                                        path}.items())
+    args = {
+        'model_path': path,
+        'use_acoustic_modem': LaunchConfiguration('use_acoustic_modem'),
+    }
+    action = IncludeLaunchDescription(source, launch_arguments=args.items())
     launch_description.add_action(action)
 
     return launch_description

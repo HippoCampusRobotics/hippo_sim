@@ -17,7 +17,9 @@ def declare_args(launch_description: LaunchDescription) -> None:
     launch_description.add_action(action)
     action = DeclareLaunchArgument('use_front_camera', default_value='False')
     launch_description.add_action(action)
-    action = DeclareLaunchArgument('use_range_sensor', default_value='false')
+    action = DeclareLaunchArgument('use_range_sensor', default_value='False')
+    launch_description.add_action(action)
+    action = DeclareLaunchArgument('use_acoustic_modem', default_value='False')
     launch_description.add_action(action)
 
 
@@ -66,6 +68,7 @@ def generate_launch_description() -> LaunchDescription:
         'use_front_camera': LaunchConfiguration('use_front_camera'),
         'use_vertical_camera': LaunchConfiguration('use_vertical_camera'),
         'use_range_sensor': LaunchConfiguration('use_range_sensor'),
+        'use_acoustic_modem': LaunchConfiguration('use_acoustic_modem'),
     }
     action = IncludeLaunchDescription(source, launch_arguments=args.items())
     launch_description.add_action(action)

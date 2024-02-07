@@ -30,5 +30,10 @@
     <!-- probably we want this to be the same as the range sensor position -->
     <xacro:property name="front_camera_position" value="0.2 0 0.1" />
     <xacro:property name="front_camera_orientation" value="0 0 0" />
+
+    <xacro:arg name="use_acoustic_modem" default="false"/>
+    <xacro:property name="modem_position" value="0 0 -0.3" />
+    <xacro:property name="modem_orientation" value="0 0 0" />
+    
     <xacro:property name="thruster_r" value="0.097" />
 </robot>

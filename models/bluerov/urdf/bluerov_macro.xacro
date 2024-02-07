@@ -13,6 +13,7 @@
         <!-- <xacro:include filename="$(find
         hippo_sim)/models/range_sensor/urdf/range_sensor_macro.xacro" /> -->
         <xacro:include filename="$(find hippo_sim)/models/camera/urdf/camera_macro.xacro" />
+        <xacro:include filename="$(find hippo_sim)/models/acoustic_modem/urdf/acoustic_modem_macro.xacro" />
 
         <xacro:property name="thruster_xy" value="${thruster_r / 2**0.5}" />
 
@@ -49,10 +50,14 @@
                     rpy="${front_camera_orientation}" />
             </xacro:if>
 
+            <xacro:if value="$(arg use_acoustic_modem)">
+                <xacro:acoustic_modem_macro parent="${link_ns}/${base_link_name}"
+                    prefix="${link_ns}/modem" xyz="${modem_position}"
+                    rpy="${modem_orientation}" />
+            </xacro:if>
         </xacro:unless>
 
         <gazebo>
-
             <xacro:if value="${simulate_kinematics == True}">
                 <plugin filename="kinematic_control" name="hippo_gz_plugins::kinematic_control">
                     <link_name>${link_ns}/${base_link_name}</link_name>

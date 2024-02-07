@@ -45,6 +45,8 @@ def generate_launch_description() -> LaunchDescription:
             LaunchConfiguration('use_front_camera', default=False),
             ' use_range_sensor=',
             LaunchConfiguration('use_range_sensor', default=False),
+            ' use_acoustic_modem=',
+            LaunchConfiguration('use_acoustic_modem', default=False),
         ]))
 
     description = {'robot_description': robot_description}

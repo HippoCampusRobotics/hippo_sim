@@ -80,6 +80,11 @@ class Bridge {
     topic_name = node_topics->resolve_topic_name("ground_truth/odometry");
     odometry_pub_ = ros_node_->create_publisher<Odometry>(topic_name, qos);
     gz_node_->Subscribe(topic_name, &Bridge::OnOdometry, this);
+
+    topic_name = node_topics->resolve_topic_name("ground_truth/modem/odometry");
+    odometry_modem_pub_ = ros_node_->create_publisher<Odometry>(topic_name, qos);
+    gz_node_->Subscribe(topic_name, &Bridge::OnModemOdometry, this);
+    
   }
 
   void CreateImuBridge() {
@@ -190,10 +195,16 @@ class Bridge {
     odometry_pub_->publish(ros_msg);
   }
 
+  void OnModemOdometry(const gz_msgs::Odometry &_msg) {
+    Odometry ros_msg;
+    ros_gz_bridge::convert_gz_to_ros(_msg, ros_msg);
+    odometry_modem_pub_->publish(ros_msg);
+  }
+
   void OnThrusterCommand(const ActuatorControls::SharedPtr _msg) {
     if (!(_msg->control.size() == throttle_cmd_pubs_.size())) {
       RCLCPP_ERROR(ros_node_->get_logger(),
-                   "ActuatControls and publisher map do not have same size!");
+                   "ActuatorControls and publisher map do not have same size!");
       return;
     }
     for (unsigned int i = 0; i < throttle_cmd_pubs_.size(); ++i) {
@@ -219,6 +230,7 @@ class Bridge {
   rclcpp::Publisher<Imu>::SharedPtr imu_pub_;
   rclcpp::Publisher<PoseStamped>::SharedPtr pose_pub_;
   rclcpp::Publisher<Odometry>::SharedPtr odometry_pub_;
+  rclcpp::Publisher<Odometry>::SharedPtr odometry_modem_pub_;
   rclcpp::Publisher<ThrusterForces>::SharedPtr thruster_forces_pub_;
   rclcpp::Publisher<sensor_msgs::msg::FluidPressure>::SharedPtr pressure_pub_;
   rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr
