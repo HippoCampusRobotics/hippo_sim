@@ -1,7 +1,7 @@
 from ament_index_python.packages import get_package_share_path
 from hippo_common.launch_helper import (
     LaunchArgsDict,
-    declare_vehicle_name,
+    declare_vehicle_name_and_sim_time,
 )
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
@@ -11,7 +11,8 @@ from launch.substitutions import LaunchConfiguration
 
 
 def declare_args(launch_description: LaunchDescription) -> None:
-    declare_vehicle_name(launch_description=launch_description)
+    declare_vehicle_name_and_sim_time(launch_description=launch_description,
+                                      use_sim_time_default='true')
     action = DeclareLaunchArgument(
         'spawn_apriltags',
         default_value='false',

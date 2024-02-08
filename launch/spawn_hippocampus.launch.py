@@ -7,6 +7,8 @@ from launch.substitutions import LaunchConfiguration
 
 
 def declare_args(launch_description: LaunchDescription) -> None:
+    launch_helper.declare_vehicle_name_and_sim_time(
+        launch_description=launch_description, use_sim_time_default='true')
     action = DeclareLaunchArgument('vehicle_name')
     launch_description.add_action(action)
     action = DeclareLaunchArgument('use_sim_time')
@@ -39,11 +41,9 @@ def generate_launch_description() -> LaunchDescription:
     path = str(package_path / 'launch/spawn_vehicle.launch.py')
     source = PythonLaunchDescriptionSource(path)
     path = str(package_path / 'models/hippo3/urdf/hippo3.xacro')
-    args = {
-        'model_path': path,
-        'use_acoustic_modem': LaunchConfiguration('use_acoustic_modem'),
-        'use_vertical_camera': LaunchConfiguration('use_vertical_camera'),
-    }
+    args = launch_helper.LaunchArgsDict()
+    args.add(['use_acoustic_modem', 'use_vertical_camera'])
+    args['model_path'] = path
     action = IncludeLaunchDescription(source, launch_arguments=args.items())
     launch_description.add_action(action)
 

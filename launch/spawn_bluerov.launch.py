@@ -9,10 +9,9 @@ from launch_ros.actions import Node
 
 
 def declare_args(launch_description: LaunchDescription) -> None:
-    action = DeclareLaunchArgument('vehicle_name')
-    launch_description.add_action(action)
-    action = DeclareLaunchArgument('use_sim_time')
-    launch_description.add_action(action)
+    launch_helper.declare_vehicle_name_and_sim_time(
+        launch_description=launch_description, use_sim_time_default='true')
+
     action = DeclareLaunchArgument('use_vertical_camera', default_value='False')
     launch_description.add_action(action)
     action = DeclareLaunchArgument('use_front_camera', default_value='False')
@@ -63,13 +62,14 @@ def generate_launch_description() -> LaunchDescription:
     path = str(package_path / 'launch/spawn_vehicle.launch.py')
     source = PythonLaunchDescriptionSource(path)
     path = str(package_path / 'models/bluerov/urdf/bluerov.xacro')
-    args = {
-        'model_path': path,
-        'use_front_camera': LaunchConfiguration('use_front_camera'),
-        'use_vertical_camera': LaunchConfiguration('use_vertical_camera'),
-        'use_range_sensor': LaunchConfiguration('use_range_sensor'),
-        'use_acoustic_modem': LaunchConfiguration('use_acoustic_modem'),
-    }
+    args = launch_helper.LaunchArgsDict()
+    args.add([
+        'use_front_camera',
+        'use_vertical_camera',
+        'use_range_sensor',
+        'use_acoustic_modem',
+    ])
+    args['model_path'] = path
     action = IncludeLaunchDescription(source, launch_arguments=args.items())
     launch_description.add_action(action)
     return launch_description
