@@ -1,9 +1,9 @@
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <geometry_msgs/msg/vector3_stamped.hpp>
-#include <hippo_msgs/msg/actuator_controls.hpp>
+#include <hippo_control_msgs/msg/actuator_controls.hpp>
+#include <hippo_control_msgs/msg/thruster_forces.hpp>
 #include <hippo_msgs/msg/angular_velocity.hpp>
 #include <hippo_msgs/msg/esc_rpms.hpp>
-#include <hippo_msgs/msg/thruster_forces.hpp>
 #include <ignition/transport/Node.hh>
 #include <rclcpp/experimental/executors/events_executor/events_executor.hpp>
 #include <rclcpp/node_interfaces/node_topics.hpp>
@@ -15,6 +15,7 @@ using namespace geometry_msgs::msg;
 using namespace sensor_msgs::msg;
 using namespace std_msgs::msg;
 using namespace hippo_msgs::msg;
+using namespace hippo_control_msgs::msg;
 using namespace ignition;
 using namespace nav_msgs::msg;
 namespace gz_msgs = ignition::msgs;

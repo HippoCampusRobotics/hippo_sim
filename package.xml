@@ -18,6 +18,7 @@
   <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>hippo_msgs</depend>
+  <depend>hippo_control_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>hippo_common</depend>
   <depend>hippo_gz_plugins</depend>

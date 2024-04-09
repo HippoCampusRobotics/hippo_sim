@@ -20,6 +20,7 @@ find_package(ros_gz_bridge REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(hippo_msgs REQUIRED)
+find_package(hippo_control_msgs REQUIRED)
 find_package(hippo_common REQUIRED)
 find_package(hippo_gz_plugins REQUIRED)
 find_package(hippo_gz_msgs REQUIRED)
@@ -72,6 +73,7 @@ ament_target_dependencies(${exec_name}
   geometry_msgs
   nav_msgs
   hippo_msgs
+  hippo_control_msgs
 )
 list(APPEND exec_targets ${exec_name})
 
