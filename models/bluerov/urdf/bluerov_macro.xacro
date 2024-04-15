@@ -41,7 +41,7 @@
             <xacro:if value="$(arg use_vertical_camera)">
                 <xacro:camera_macro parent="${link_ns}/${base_link_name}"
                     prefix="${link_ns}/vertical_camera" topic_prefix="${link_ns}/vertical_camera"
-                    ignition_frame_id="${link_ns}::vertical_camera" 
+                    ignition_frame_id="${link_ns}::vertical_camera"
                     xyz="${vertical_camera_position}"
                     rpy="${vertical_camera_orientation}" />
             </xacro:if>
@@ -49,7 +49,7 @@
             <xacro:if value="$(arg use_front_camera)">
                 <xacro:camera_macro parent="${link_ns}/${base_link_name}"
                     prefix="${link_ns}/front_camera" topic_prefix="${link_ns}/front_camera"
-                    ignition_frame_id="${link_ns}::front_camera" 
+                    ignition_frame_id="${link_ns}::front_camera"
                     xyz="${front_camera_position}"
                     rpy="${front_camera_orientation}" />
             </xacro:if>
@@ -127,6 +127,8 @@
                     <drop_probability>0.05</drop_probability>
                     <max_detection_distance>5.0</max_detection_distance>
                     <drop_probability_exp>2.0</drop_probability_exp>
+                    <translation>${range_sensor_position}</translation>
+                    <rotation>${range_sensor_orientation}</rotation>
                     <model name="range_tag_00">
                         <link>base_link</link>
                         <id>0</id>
