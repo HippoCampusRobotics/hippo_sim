@@ -2,8 +2,8 @@
 Changelog for package hippo_sim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2024-09-24)
+------------------
 * removed nonexistent dependency
 * migration to jazzy/harmonic
 * ditched yapf
