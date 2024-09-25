@@ -4,6 +4,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
 
 
 def declare_args(launch_description: LaunchDescription) -> None:
@@ -47,6 +48,32 @@ def generate_launch_description() -> LaunchDescription:
     args.add(['use_acoustic_modem', 'use_vertical_camera'])
     args['model_path'] = path
     action = IncludeLaunchDescription(source, launch_arguments=args.items())
+    launch_description.add_action(action)
+
+    ############################################################################
+    # HippoCampus Actuator Mixer
+    ############################################################################
+
+    args = launch_helper.LaunchArgsDict()
+    args.add_vehicle_name_and_sim_time()
+    pkg = "hippo_control"
+    config_file = launch_helper.config_file_path(
+        pkg, "actuator_mixer/hippocampus_normalized_default.yaml"
+    )
+    
+    action = DeclareLaunchArgument("mixer_path", default_value=config_file)
+    launch_description.add_action(action)
+
+    action = Node(
+        package="hippo_control",
+        executable="actuator_mixer_node",
+        namespace=LaunchConfiguration("vehicle_name"),
+        parameters=[
+            args,
+            LaunchConfiguration("mixer_path"),
+        ],
+        output="screen",
+    )
     launch_description.add_action(action)
 
     return launch_description
