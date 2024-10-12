@@ -2,8 +2,8 @@
 Changelog for package hippo_sim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2024-10-12)
+------------------
 * added mixer to spawn launch files
 * Contributors: NBauschmann
 
