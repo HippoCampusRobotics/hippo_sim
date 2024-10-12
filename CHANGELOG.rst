@@ -2,6 +2,11 @@
 Changelog for package hippo_sim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* added mixer to spawn launch files
+* Contributors: NBauschmann
+
 1.0.0 (2024-09-24)
 ------------------
 * removed nonexistent dependency
