@@ -88,7 +88,7 @@ def generate_launch_description() -> LaunchDescription:
     args.add_vehicle_name_and_sim_time()
     pkg = "hippo_control"
     config_file = launch_helper.config_file_path(
-        pkg, "actuator_mixer_bluerov_advanced.yaml"
+        pkg, "actuator_mixer/bluerov_normalized_default.yaml"
     )
     
     action = DeclareLaunchArgument("mixer_path", default_value=config_file)
@@ -96,11 +96,11 @@ def generate_launch_description() -> LaunchDescription:
 
     action = Node(
         package="hippo_control",
-        executable="actuator_mixer_bluerov_node",
+        executable="actuator_mixer_node",
         namespace=LaunchConfiguration("vehicle_name"),
         parameters=[
-            args,
             LaunchConfiguration("mixer_path"),
+            args,
         ],
         output="screen",
     )
