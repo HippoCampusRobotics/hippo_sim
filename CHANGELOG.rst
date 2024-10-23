@@ -2,8 +2,8 @@
 Changelog for package hippo_sim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.2 (2024-10-23)
+------------------
 * use dumb mixer for the bluerov
 * Contributors: Thies Lennart Alff
 
