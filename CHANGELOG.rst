@@ -2,6 +2,11 @@
 Changelog for package hippo_sim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use dumb mixer for the bluerov
+* Contributors: Thies Lennart Alff
+
 1.0.1 (2024-10-12)
 ------------------
 * added mixer to spawn launch files
