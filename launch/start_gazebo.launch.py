@@ -44,6 +44,7 @@ def create_gazebo_gui_action() -> ExecuteProcess:
     return ExecuteProcess(
         cmd=['gz', 'sim', '-g', '-v 1'],
         condition=IfCondition(LaunchConfiguration('start_gui')),
+        additional_env={'QT_QPA_PLATFORM': 'xcb'},
         output='log',
         on_exit=Shutdown(),
     )
