@@ -2,6 +2,12 @@
 Changelog for package hippo_sim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* change t200 linear thrust coefficient to zero to avoid accidental deadzone for very small thrusts
+* add fix for wayland problems with Gazebo GUI by adding environment variable to launchdescription
+* Contributors: NBauschmann
+
 1.0.2 (2024-10-23)
 ------------------
 * use dumb mixer for the bluerov
