@@ -39,9 +39,9 @@ def offset_pose(x, y, z, R, P, Y, model):
 
 def clean_model(model):
     link = model.find('link')
-    if link:
+    if link is not None:
         inertial = link.find('inertial')
-        if inertial:
+        if inertial is not None:
             link.remove(inertial)
     return model
 
@@ -160,7 +160,7 @@ def main():
         with open(cache_sdf) as f:
             sys.stdout.write(f.read())
         return
-    cmds = [shlex.split(f'ign sdf -p {x["path"]}') for x in urdf]
+    cmds = [shlex.split(f'gz sdf -p {x["path"]}') for x in urdf]
     p = [
         subprocess.Popen(x, stdout=subprocess.PIPE, universal_newlines=True)
         for x in cmds
