@@ -2,8 +2,8 @@
 Changelog for package hippo_sim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.4 (2024-11-27)
+------------------
 * fix ign command to gz for compatibility with Gazebo Harmonic
 * Contributors: NBauschmann
 
