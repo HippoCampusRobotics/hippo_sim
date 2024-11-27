@@ -2,6 +2,11 @@
 Changelog for package hippo_sim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix ign command to gz for compatibility with Gazebo Harmonic
+* Contributors: NBauschmann
+
 1.0.3 (2024-10-30)
 ------------------
 * change t200 linear thrust coefficient to zero to avoid accidental deadzone for very small thrusts
