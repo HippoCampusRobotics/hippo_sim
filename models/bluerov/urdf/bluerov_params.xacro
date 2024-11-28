@@ -19,6 +19,7 @@
     <xacro:property name="imu_noise" value="0.0003"/>
 
     <xacro:arg name="use_range_sensor" default="false" />
+    <!-- we want this to be the same as the front camera position -->
     <xacro:property name="range_sensor_position" value="0.2 0 0.1" />
     <xacro:property name="range_sensor_orientation" value="${radians(0)} ${radians(0)} ${radians(0)}" />
 
@@ -27,7 +28,6 @@
     <xacro:property name="vertical_camera_orientation" value="0 ${radians(90)} 0" />
 
     <xacro:arg name="use_front_camera" default="false" />
-    <!-- probably we want this to be the same as the range sensor position -->
     <xacro:property name="front_camera_position" value="0.2 0 0.1" />
     <xacro:property name="front_camera_orientation" value="0 0 0" />
 
