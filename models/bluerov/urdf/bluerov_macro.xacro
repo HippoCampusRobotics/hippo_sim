@@ -124,7 +124,7 @@
                     <range_noise_stddev>0.02</range_noise_stddev>
                     <fov_angle>${radians(90.0)}</fov_angle>
                     <max_viewing_angle>${radians(140.0)}</max_viewing_angle>
-                    <drop_probability>0.05</drop_probability>
+                    <drop_probability>0.01</drop_probability>
                     <max_detection_distance>5.0</max_detection_distance>
                     <drop_probability_exp>2.0</drop_probability_exp>
                     <translation>${range_sensor_position}</translation>
