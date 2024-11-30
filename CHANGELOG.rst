@@ -2,8 +2,8 @@
 Changelog for package hippo_sim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.5 (2024-11-30)
+------------------
 * decrease probability that distance measurements get lost
 * more logical comment about range sensor
 * move vertical camera position to the back of bluerov
