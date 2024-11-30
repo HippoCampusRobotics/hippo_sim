@@ -2,6 +2,13 @@
 Changelog for package hippo_sim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* decrease probability that distance measurements get lost
+* more logical comment about range sensor
+* move vertical camera position to the back of bluerov
+* Contributors: NBauschmann
+
 1.0.4 (2024-11-27)
 ------------------
 * fix ign command to gz for compatibility with Gazebo Harmonic
