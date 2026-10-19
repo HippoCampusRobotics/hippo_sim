@@ -3,9 +3,9 @@ from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
     ExecuteProcess,
+    Shutdown,
 )
 from launch.conditions import IfCondition
-from launch.events import Shutdown
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 
